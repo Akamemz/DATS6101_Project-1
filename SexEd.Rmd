@@ -19,13 +19,13 @@ US_Birth_No<-as.numeric(sexedstats$U.S..Births)
 US_Birth_Rate<-as.numeric(sexedstats$U.S..Birth.Rate)
 Age_Groups<-as.factor(sexedstats$Age.Group..Years.)
 State_Birth_Rate<-as.numeric(sexedstats$State.Rate)
-as.factor(sexedstats$Median.Household.Income)
+Household_Income<-as.integer(sexedstats$Median.Household.Income)
 ```
 
 ```{r}
 library(ggplot2)
 ggplot(sexedstats, aes(y=State), aes(x=Year))+
-  geom_boxplot(aes(State))+
+  geom_bar(aes(State)aes(Year))+
   ggtitle("State")+
   labs(y="State", x="Year")
 ```
