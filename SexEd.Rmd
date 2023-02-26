@@ -19,15 +19,15 @@ US_Birth_No<-as.numeric(sexedstats$U.S..Births)
 US_Birth_Rate<-as.numeric(sexedstats$U.S..Birth.Rate)
 Age_Groups<-as.factor(sexedstats$Age.Group..Years.)
 State_Birth_Rate<-as.numeric(sexedstats$State.Rate)
-Household_Income<-as.integer(sexedstats$Median.Household.Income)
+as.factor(sexedstats$Median.Household.Income)
 ```
 
 ```{r}
 library(ggplot2)
-ggplot(ggplot(sexedstats, aes(y=weight), aes(x=height))+
-  geom_boxplot(aes(weight))+
-  ggtitle("Player Weight")+
-  labs(y="Weight", x="")+)
+ggplot(sexedstats, aes(y=State), aes(x=Year))+
+  geom_boxplot(aes(State))+
+  ggtitle("State")+
+  labs(y="State", x="Year")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
