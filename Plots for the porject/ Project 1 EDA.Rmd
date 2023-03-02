@@ -1,0 +1,189 @@
+---
+title: "project 1"
+author: "Xue Ming Wang(G20580112)"
+date: "2023-02-26"
+output: html_document
+---
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes some helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# You will need to install it (once) from GitHub.
+# library(devtools)
+# devtools::install_github("physicsland/ezids")
+# Then load the package in your R session.
+library(ezids)
+```
+```{r setup, include=FALSE}
+# Some of common RMD options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# Can globally set option for number display format.
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+```
+
+```{r}
+p1 <- read.csv(file = 'Project1_data_clean.csv')
+str(p1)
+```
+
+## Individual varibles 
+### State.Rate 
+```{r}
+par(mfrow = c(2, 2))
+hist(p1$State.Rate)
+boxplot(p1$State.Rate)
+qqnorm(p1$State.Rate)
+qqline(p1$State.Rate)
+```
+### State.Births 
+```{r}
+par(mfrow = c(2, 2))
+hist(p1$State.Births )
+boxplot(p1$State.Births )
+qqnorm(p1$State.Births )
+qqline(p1$State.Births )
+```
+### U.S..Births  
+```{r}
+par(mfrow = c(2, 2))
+hist(p1$U.S..Births)
+boxplot(p1$U.S..Births)
+qqnorm(p1$U.S..Births)
+qqline(p1$U.S..Births)
+```
+### U.S..Birth.Rate
+```{r}
+par(mfrow = c(2, 2))
+hist(p1$U.S..Birth.Rate)
+boxplot(p1$U.S..Birth.Rate)
+qqnorm(p1$U.S..Birth.Rate)
+qqline(p1$U.S..Birth.Rate)
+```
+### Median.Household.Income
+```{r}
+par(mfrow = c(2, 2))
+hist(p1$Median.Household.Income)
+boxplot(p1$Median.Household.Income)
+qqnorm(p1$Median.Household.Income)
+qqline(p1$Median.Household.Income)
+```
+### Enrollment 
+```{r}
+par(mfrow = c(2, 2))
+hist(p1$Enrollment )
+boxplot(p1$Enrollment)
+qqnorm(p1$Enrollment)
+qqline(p1$Enrollment)
+```
+## Removing outliers
+```{r}
+newStatebirth= outlierKD2(p1, State.Births, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+newEnrollment= outlierKD2(p1, Enrollment, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+str(p1)
+```
+## Building new dataframe
+```{r}
+Year<-p1$Year
+State<-p1$State
+Abstinence.Scales<-p1$Abstinence.Scales
+State.Rate<-p1$State.Rate
+newStatebirth<-newStatebirth$State.Births
+U.S..Births<-p1$U.S..Births
+U.S..Birth.Rate<- p1$U.S..Birth.Rate
+Unit <- p1$Unit 
+Median.Household.Income <-p1$ Median.Household.Income
+newEnrollment<-newEnrollment$Enrollment
+
+df<- data.frame(Year,State, Abstinence.Scales, State.Rate, newStatebirth, U.S..Births, U.S..Birth.Rate, Unit, Median.Household.Income, newEnrollment)
+summary(df)
+df<-na.omit(df)
+```
+## Year vs State Births
+```{r}
+library(ggplot2) 
+ggplot(data=df, aes(x=Year, y=U.S..Births, group=1)) +
+  geom_line()+
+  geom_point()
+```
+
+## Year vs State Births
+```{r}
+library(ggplot2) 
+ggplot(data=df)+
+  geom_point(mapping = aes(x=Year, y=newStatebirth, color=State))
+```
+
+## State.Births vs state
+```{r}
+library(ggplot2) 
+ggplot(data=df)+
+  geom_point(mapping = aes(x=newStatebirth, y=State, color=Abstinence.Scales))
+```
+
+## income vs State.birth
+With Chi-square test, I assume that the null hypothesis is that `Median.Household.Income` and `State.Rate` are independent. The alternative hypotheses is that `Median.Household.Income` and `State.Rate`not are independent.
+```{r}
+chi <- chisq.test(df$newStatebirth, df$Median.Household.Income)
+chi
+```
+The p-value here is 0.2161, which is greater than 0.05 and it considered to be not statistically significant. Then, the null hypothesis cannot be rejected. Therefore, the two variables, rank and admission, are independent.
+
+```{r}
+library(ggplot2) 
+ggplot(data=df)+
+  geom_point(mapping = aes(x=Median.Household.Income, y=newStatebirth, color=Abstinence.Scales))
+```
+## income vs State.birth
+With Chi-square test, I assume that the null hypothesis is that `Median.Household.Income` and `State.Rate` are independent. The alternative hypotheses is that `Median.Household.Income` and `State.Rate`not are independent.
+```{r}
+chi <- chisq.test(df$newStatebirth, df$Median.Household.Income)
+chi
+```
+The p-value here is 0.2, which is greater than 0.05 and it considered to be not statistically significant. Then, the null hypothesis cannot be rejected. Therefore, the two variables, rank and admission, are independent.
+
+```{r}
+library(ggplot2) 
+ggplot(data=df)+
+  geom_point(mapping = aes(x=Median.Household.Income, y=newStatebirth, color=Abstinence.Scales))
+```
+
+## Cover vs stress
+```{r}
+cover <- subset(df, Abstinence.Scales==1) 
+str(cover)
+stress <- subset(df, Abstinence.Scales==2) 
+str(stress)
+```
+
+### state birth with different Abstinence.Scales 
+```{r}
+summary(cover$newStatebirth)
+summary(stress$newStatebirth)
+var(cover$newStatebirth)
+var(stress$newStatebirth)
+```
+
+### Median.Household.Income with different Abstinence.Scales 
+```{r}
+summary(cover$Median.Household.Income)
+summary(stress$Median.Household.Income)
+var(cover$Median.Household.Income)
+var(stress$Median.Household.Income)
+```
+
+### Enrollment with different Abstinence.Scales 
+```{r}
+summary(cover$newEnrollment)
+summary(stress$newEnrollment)
+var(cover$newEnrollment)
+var(stress$newEnrollment)
+```
+
+### cover and stress in state birth
+The null hypothesis here is that, µ1 (cover) = µ0 (stress), the state birth averages are the same. The alternative hypotheses is, µ1 (cover) ≠ µ0 (stress), the state birth averages are different.
+```{r}
+t_cover_state_birth = t.test(cover$newStatebirth, stress$newStatebirth, conf.level=0.95)
+t_cover_state_birth
+```
+The p-value here is 3e-11, which is less than 0.05 and it considered to be statistically significant. Then, the null hypothesis can be rejected. Therefore, µ1 (cover) ≠ µ0 (stress), the state birth averages are different.
+
