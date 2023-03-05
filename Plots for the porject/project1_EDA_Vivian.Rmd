@@ -138,14 +138,17 @@ summary(df)
 df<-na.omit(df)
 ```
 
-## Year vs State Births
+## Year vs US Births
 ```{r}
 library(ggplot2) 
 ggplot(data=p1, aes(x=Year, y=U.S..Births, group=1)) +
   geom_line()+
   geom_point()
 ```
-
+```{r}
+ggplot(data=p1, aes(x=Year, y=U.S..Birth.Rate)) +
+  geom_bar(stat="identity")
+```
 ## Year vs State Births
 ```{r}
 library(ggplot2) 
