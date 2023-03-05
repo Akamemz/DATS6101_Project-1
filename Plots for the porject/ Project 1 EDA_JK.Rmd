@@ -192,8 +192,10 @@ The p-value here is 3e-11, which is less than 0.05 and it considered to be stati
 ```{r}
 library(ggplot2)
 
-ggplot(df, aes(Year, U.S..Birth.Rate))+geom_col(fill="Dark Orange")
+ggplot(p1, aes(x=Year, y=U.S..Birth.Rate))+geom_col(fill="Dark Orange")+
 ggtitle("US Birthrate")
+ggplot(df, aes(x=Year, y=U.S..Birth.Rate))+geom_col(fill="Dark Green")+
+ggtitle("US Birthrates")
 ```
 
 ```{r}
