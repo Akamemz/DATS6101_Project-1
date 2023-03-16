@@ -1,0 +1,54 @@
+---
+title: "Project 1"
+author: "Jonathan Kratchman"
+date: "2023-03-16"
+output: html_document
+code_folding: hide
+number_sections: false
+toc: yes
+toc_depth: 3
+---
+
+```{r init, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdction
+
+  We are researching the relationship between teenage pregnancy and the "strictness" of abstinence education in each state's curriculum. Across the country, many states have laws which mandate abstience as being a part of the sexual education curriculum either requiring abstinence being taught as the only option to prevent pregancy or as one of many options including contraceptive use to prevent pregnancy ().
+  
+  This research is more than timely as there are conflicts between schools, parents, and politicians on how these sensitive topics, including sexual education are taught. There currently are talking points around requiring teachers to teach from one point of view only which also includes sexual education. Looking at the teenage pregnancy rate in relationship to these policies will allow us some insight into what the correct method is to prevent teenage pregnancies which in itself is a public health crisis().
+  
+## Data Used
+**CDC Dataset**
+
+  For the core of our data, we used the CDC's National Center for Health Statistics's dashboard "U.S. and State Trends on Teen Births, 1990–2019". This is a comprehensive dataset displaying the year, state, age groups of the people studied from 15 to 17, 15 to 19, and 18 to 19 years old. In addition, the state number of state births and state birth rate per 1000 people each year is reported as well as the number of births nationwide along with the birthrate for the country as a whole. 
+  
+  
+```{r}
+CDC_File<-read.csv("/Users/jonathan/Documents/GitHub/DATS6101_Project-1/Tables/NCHS_-_U.S._and_State_Trends_on_Teen_Births.csv")
+
+str(CDC_File)
+```
+ 
+  Describing the structure, the year is an integer variable which posts the years for each observation. State is a character variable which lists out all 50 states and is nominal. Age groups is a categorical variable which is also character when uploaded into R. The State Birth Rate and US Birth Rate are numeric variables while the total number of births are uploaded into R as character, but which we converted into integer in the combined data. These would be interval in practice, but ratio in theory if there were a hypothetical state with no births.
+
+**Household Income and School Enrollment**
+  Next, we uploaded household income data from the Census Beurau? All variables are character in this dataset. This reports the state, year, and the median household income for each state and year. In cleaning the data, we added the median household income to each state for each year from this source. NOTE ADD IN ENROLLMENT
+
+```{r}
+HouseHold_Income<-read.csv("/Users/jonathan/Documents/GitHub/DATS6101_Project-1/Tables/Median_Household_Income-h08.csv")
+
+str(HouseHold_Income)
+```
+
+**Abstinence Mandates and Cleaned Data Set**
+
+  After appending household income for each state in each year, we used the SIECUS State Profiles, a policy tracking website on sexual education laws and mandates. We categorized each state into a 1 of 3 categories. We coded "1" for a state where there is no mention of abstinence education. We coded "2" for states which covered abstinence as an option to prevent pregnancy, but students are allowed to learn about other options to prevent pregnancy such as contraceptives. Lastly, we coded "3" for states which stressed abstinence as the only option to prevent pregnancy.
+
+
+```{r}
+DF<-read.csv("/Users/jonathan/Documents/GitHub/DATS6101_Project-1/Tables/Project1_data_clean.csv")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
