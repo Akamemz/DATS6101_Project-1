@@ -13,15 +13,7 @@ output:
     toc: yes
     toc_depth: '3'
 ---
-You will also be graded on the technical quality of your analysis as presented in your write-up. You will be assessed for proper and sensical usage of R functions and statistical tools such as:
- Summary of the dataset
- Descriptive statistics
- Graphical representations of the data
- [Proper usage when applicable] Measures of Variance / sd
- [Proper usage when applicable] Normality tests
- [Proper use when applicable] Initial correlation / Chi Square tests / ANOVA analysis / Z-test or Z-interval / T-test or T-interval etc.
-
-
+# Project 1 Summary Paper: Part B-Technical Analysis
 ```{r init, include=F}
 # The package "ezids" (EZ Intro to Data Science) includes some helper functions we developed for the course. 
 # Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
@@ -74,7 +66,7 @@ xkablesummary(p1firsthalf, title="Table: Statistics summary")
 xkablesummary(p2secondhalf, title="Table: Statistics summary")
 ```
 
-## Graphical representations of overall trend
+## Overall Trend
 
 ### Year vs US Births
 ```{r}
@@ -112,12 +104,12 @@ qqnorm(p1$Enrollment, main="Histogram of Enrollment")
 qqline(p1$Enrollment, main="Histogram of Enrollment")
 ```
 
-Figure 4. With vs Without Outliers in Enrollment
+Figure 3. With vs Without Outliers in Enrollment
 ```{r}
 newEnrollment = outlierKD2(p1, Enrollment, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
 ```
 
-Enrollment is another variable that exhibits a non-normal distribution, displaying a right-skewed pattern. However, after the outliers have been addressed, the distribution appears to be more normal than previously observed. It is possible that the presence of outliers in the enrollment data may be attributed to various reasons, such as teens frequently moving in and out of the school. Factors such as school absenteeism, transfer to another school, or re-enrollment could potentially contribute to the occurrence of outliers among teenagers.
+Enrollment is another variable that exhibits a non-normal distribution, displaying a right-skewed pattern (figure 3). However, after the outliers have been addressed, the distribution appears to be more normal than previously observed. It is possible that the presence of outliers in the enrollment data may be attributed to various reasons, such as teens frequently moving in and out of the school. Factors such as school absenteeism, transfer to another school, or re-enrollment could potentially contribute to the occurrence of outliers among teenagers.
 
 ### With vs without outliers 
 ```{r, results='hide'}
@@ -141,10 +133,11 @@ df<-na.omit(df)
 ```{r}
 par(mfrow=c(2,1))
 ggplot(p1, aes(x=Year, y=U.S..Birth.Rate))+geom_col(fill="Dark Orange")+
-  labs(title = "US Birthrate with Outlier", caption = "Figure 3. US Birthrate with Outlier")
+  labs(title = "US Birthrate with Outliers", caption = "Figure 4. US Birthrate with Outliers")
 ggplot(df, aes(x=Year, y=newStatebirth))+geom_col(fill="Dark Green")+
-labs(title = "US Birthrate without Outlier", caption = "Figure 4. US Birthrate without Outlier")
+labs(title = "US Birthrate without Outliers", caption = "Figure 5. US Birthrate without Outliers")
 ```
+
 The two plots showed analogous trends, indicating a consistent decrease in the birth rate in the United States from 2007 to 2013, regardless of the presence or absence of outliers.
 
 ### Dealing with Outliers
@@ -155,7 +148,7 @@ Removing all the outliers can be an option to deal with outliers. On the other h
 ```{r, results='hide', fig.keep = 'none'}
 newStatebirth= outlierKD2(p1, State.Births, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
 outSB = subset(newStatebirth, is.na(State.Births)) 
-xkabledplyhead(outSB, title = "Outlier States")
+xkabledplyhead(outSB, title = "Outlier States for State Birth")
 ```
 
 ```{r}
@@ -172,18 +165,28 @@ ggplot() +
   theme_void() +
   coord_map() +
   scale_fill_manual(values = c("california" = "red", "texas" = "blue", "florida" = "green", "Other" = "white"), name = "fill_color") +
-  labs(title = "Outlier States for state birth", caption = "Figure 5. Outlier States for state birth")
+  labs(title = "Outlier States for state birth", caption = "Figure 6. Outlier States for state birth")
 ```
 
-During our examination of state birth outliers, it became evident that the majority of these outliers occur in three particular states: California, Florida, and Texas (Figure 3). In comparison to other states, these three states exhibit substantially higher rates of teen pregnancy. 
+During our examination of state birth outliers, it became evident that the majority of these outliers occur in three particular states: California, Florida, and Texas (Figure 6). In comparison to other states, these three states exhibit substantially higher rates of teen pregnancy. 
 
-If we observe outliers in California, Florida, and Texas with respect to teen pregnancy rates, it is important to note that the high populations of these states could be a contributing factor to the outliers. Therefore, it may not be appropriate to simply delete these outliers without further investigation. Instead, we should consider conducting more in-depth analysis to determine the underlying causes of the high teen pregnancy rates in these states. It is possible that various demographic, socio-economic, or cultural factors could be at play, and understanding these factors could inform targeted interventions to reduce the prevalence of teen pregnancy in these states. For further research on the outliers in California, Florida, and Texas, we would consider incorporating the overall teenage population in each states to see the proportion between teenage population and state birth. This would allow us to better understand the prevalence of teen pregnancy within each state and determine the extent to which it contributes to overall state birth rates.
+### Year vs State Births
+```{r}
+library(ggplot2) 
+ggplot(data=p1)+
+  geom_point(mapping = aes(x=Year, y=State.Births, color=State))+
+  labs(title = "Scatterplot of State Birth in TP", caption = "Figure 7. Scatterplot of State Birth")
+```
+
+As depicted in Figure 7, although California, Florida, and Texas (the outlier states) have a higher number of births compared to other states, they still display a trend similar to that of other states, which is a decrease in the number of teen pregnancies over the years.
+
+Alternatively, if we observe outliers in California, Florida, and Texas with respect to teen pregnancy rates, it is important to note that the high populations of these states could be a contributing factor to the outliers. Therefore, it may not be appropriate to simply delete these outliers without further investigation. Instead, we should consider conducting more in-depth analysis to determine the underlying causes of the high teen pregnancy rates in these states. It is possible that various demographic, socio-economic, or cultural factors could be at play, and understanding these factors could inform targeted interventions to reduce the prevalence of teen pregnancy in these states. For further research on the outliers in California, Florida, and Texas, we would consider incorporating the overall teenage population in each states to see the proportion between teenage population and state birth. This would allow us to better understand the prevalence of teen pregnancy within each state and determine the extent to which it contributes to overall state rates.
 
 #### Enrollment outliers
 ```{r, results='hide', fig.keep = 'none'}
 newEnrollment= outlierKD2(p1, Enrollment, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
 outE = subset(newEnrollment, is.na(Enrollment)) 
-xkabledplyhead(outE, title = "Outlier States")
+xkabledplyhead(outE, title = "Outlier States for Enrollment")
 ```
 
 ```{r}
@@ -202,44 +205,44 @@ ggplot() +
   theme_void() +
   coord_map() +
   scale_fill_manual(values = c("california" = "red", "texas" = "blue", "florida" = "green", "orange" = "orange", "white" = "white")) +
-  labs(title = "Outlier States for Enrollment", caption = "Figure 6. Outlier States for Enrollment")
+  labs(title = "Outlier States for Enrollment", caption = "Figure 8. Outlier States for Enrollment")
 ```
-During our examination of Enrollment outliers, it became evident that the majority of these outliers occur in four particular states: California, Florida, New York and Texas (Figure 5). In comparison to other states, these three states exhibit substantially higher frequency of enrollment. 
+
+During our examination of Enrollment outliers, it became evident that the majority of these outliers occur in four particular states: California, Florida, New York and Texas (Figure 8). In comparison to other states, these three states exhibit substantially higher frequency of enrollment. 
 
 Just like the outliers for state birth, regarding the outliers observed in the enrollment data of California, Florida, New York, and Texas, it may not be appropriate to simply delete them. Instead, it would be better to investigate more on the reasons for these outliers and determine whether they are indicative of any underlying issues related to student mobility or other factors. 
-# Unfinished 
 
-## Year vs State Births
-```{r}
-library(ggplot2) 
-ggplot(data=p1)+
-  geom_point(mapping = aes(x=Year, y=State.Births, color=State))+
-  labs(title = "Outlier States for Enrollment", caption = "Figure 7. Outlier States for Enrollment")
-```
 
 
 ## Abstinence Scales
+Next, we will analyze the correlation between the abstinence rates of each state and their respective birth rates.
 
 ### State.Births vs state
 ```{r}
 library(ggplot2) 
 ggplot(data=p1)+
   geom_point(mapping = aes(x=State.Births, y=State, color=Abstinence.Scales))+
-  labs(title = "Outlier States for Enrollment", caption = "Figure 5. Outlier States for Enrollment")
+  labs(title = "State births by State Accounting for Abstinence Education", caption = "Figure 9. State births by State Accounting for Abstinence Education")
 ```
 
-## difference between Cover vs stress
+Figure 9 displayed a scatter plot depicting the state births of each state alongside their corresponding abstinence scales. However, no discernible patterns were observed in the plot, indicating the need for further analysis of different abstinence scale groups.
 
-### split cover and stress into two groups
+### Difference between Cover vs Stress
+To address our research question concerning sexual education laws, we need to examine whether various laws have an impact on state birth and state rate. Therefore, we will undertake the required steps to test whether there are any disparities between the covered and stressed groups.
+
+To further investigate, we categorized all states into two groups, covered group and stressed group. We assigned a label of 1 to the states that provide basic sex education programs, and a label of 2 to those states that have a strict approach to sex education. For states that do not have any laws regarding sex education, we assumed that they provide basic sex education programs and included them in the 1 category. 
+
+#### Split cover and stress into two groups 
 ```{r}
-cover <- subset(p1, Abstinence.Scales==1) 
+cover <- subset(p1, Abstinence.Scales==0 | Abstinence.Scales==1) 
 str(cover)
 stress <- subset(p1, Abstinence.Scales==2) 
 str(stress)
 ```
 
-### state birth with different Abstinence.Scales 
-```{r}
+
+#### Descriptive statistics of both group for State Birth
+```{r, results='hide'}
 summary(cover$State.Births)
 summary(stress$State.Births)
 var(cover$State.Births)
@@ -250,13 +253,16 @@ sd(stress$State.Births)
 
 ```{r}
 Title= c("Min", "1st Qu",  "Median",    "Mean", "3rd Qu",  "Max", "Variance", "SD")
-Cover=c(245 ,    868   , 2801 ,   6347 ,   6124,   53417, 116e+08,10769)
+Cover=c(245 ,    922   , 2488 ,   4868 ,   4429,   53417, 78103921,8838)
 Stress=c(530,    3778,    6756,    8515,   10063,   54284, 74614414,8638)
 df=data.frame(Title, Cover, Stress)
-xkabledply( df, title="Cover vs Stress for State Birth", pos="center", bso="hover" )
+xkabledply(df, title="Cover vs Stress for State Birth", pos="center", bso="hover" )
 ```
-### state birth rate with different Abstinence.Scales 
-```{r, include=F}
+
+The table provides a comparison between two groups of states, categorized as `Cover` and `Stress`, based on their state birth. Looking at the data, the median state birth for the `Cover` group is 2488, while it is higher for the `Stress` group at 6756. The mean state birth for the `Cover` group is 4868, while it is higher for the `Stress` group at 8515. This indicates that the average state birth of cover is higher in the `Stress` group. The variance for the `Cover` group is 78103921, while it is slightly lower for the `Stress` group at 74614414. This indicates that the spread of state birth is slightly smaller in the `Stress` group. The standard deviation for both groups is very similar, with the `Cover` group having a standard deviation of 8838 and the `Stress` group having a standard deviation of 8638. This suggests that the distribution of state birth in both groups is roughly the same. Overall, the table suggest that there are differences in state rate between states that provide basic sex education programs and states that have a strict approach to sex education. However, the differences are not very large and there is overlap between the two groups. 
+
+#### Descriptive statistics of both group for State Birth
+```{r, results='hide'}
 summary(cover$State.Rate)
 summary(stress$State.Rate)
 var(cover$State.Rate)
@@ -267,27 +273,51 @@ sd(stress$State.Rate)
 
 ```{r}
 Title= c("Min", "1st Qu",  "Median",    "Mean", "3rd Qu",  "Max", "Variance", "SD")
-Cover=c(10.1,    20.2  ,  28.0,    29.8  ,  38.6,    63.9,142,11.9)
+Cover=c(9.4,    22.1  ,  29.6,    30.7  ,  38.7,    63.9 , 126,11.2)
 Stress=c(12.1,    25.7,    33.5,    35.4,    43.5,    70.1,152, 12.3)
 df=data.frame(Title, Cover, Stress)
-xkabledply( df, title="Cover vs Stress for State Birth Rate", pos="center", bso="hover" )
+xkabledply( df, title="Cover vs Stress for state rate", pos="center", bso="hover" )
 ```
 
-### cover and stress in state birth
-#### t-test
+The table provides a comparison between two groups of states, categorized as `Cover` and `Stress`, based on their state rates. The median birth rate for the `Cover` group is 29.6, and for the `Stress` group  is 33.5. The mean birth rate for the `Cover` group is 30.7, while for the `Stress` group is 35.4. This means that the average birth rate is higher in the `Stress` group than in the `Cover` group. The variance for the `Cover` group is 126.0, while for the `Stress` group it is 152.0. This means that the spread of birth rates is slightly larger in the `Stress` group than in the `Cover` group. The standard deviation for the `Cover` group is 11.2, while for the `Stress` group it is 12.3. This means that the distribution of birth rates in both groups is roughly the same, but slightly more spread out in the `Stress` group. Overall, the table suggests that there are differences in birth rates between states with basic sex education programs and those with a strict approach to sex education. The `Stress` group has a slightly higher average birth rate and a slightly larger spread of birth rates, but the differences are not very large. Moreover, `Stress` group seems to have higher state rate than `Cover` group.  
+
+Whether the two groups are the same is still not clear. We need more testing to be verified. To do so, the t-test and t-interval will be able to analyze the mean of the two groups in further detail.
+
+
+
+#### T-test for cover and stress in state birth
 The null hypothesis here is that, µ1 (cover) = µ0 (stress), the state birth averages are the same. The alternative hypotheses is, µ1 (cover) ≠ µ0 (stress), the state birth averages are different.
 ```{r}
-t_cover_state_birth = t.test(cover$State.Births, stress$State.Births, conf.level=0.95)
-t_cover_state_birth
+t_state_birth = t.test(cover$State.Births, stress$State.Births, conf.level=0.95)
+t_state_birth
 ```
-The p-value here is 3e-11, which is less than 0.05 and it considered to be statistically significant. Then, the null hypothesis can be rejected. Therefore, µ1 (cover) ≠ µ0 (stress), the state birth averages are different.
- 
-#### t-interval
-```{r}
-tint_gpa_cover = t.test(x=cover$State.Births)
-tint_gpa_cover
-tint_gpa_stress = t.test(x=stress$State.Births)
-tint_gpa_stress 
-```
+The result indicates a t-value of -5 and a degrees of freedom of 513. The p-value here is 1e-06, which is less than 0.05 and it considered to be statistically significant. Then, the null hypothesis can be rejected. Therefore, µ1 (cover) ≠ µ0 (stress), the state birth averages are different. The 95% confidence interval also suggests that the stressed group has a significantly higher mean state birth than the covered group.
 
-### corrlation
+#### T-test for cover and stress in state birthrate
+The null hypothesis here is that, µ1 (cover) = µ0 (stress), the state birth averages are the same. The alternative hypotheses is, µ1 (cover) ≠ µ0 (stress), the state birth averages are different.
+```{r}
+t_state_rate = t.test(cover$State.Rate , stress$State.Rate, conf.level=0.95)
+t_state_rate
+```
+The result indicates a t-value of -5 and a degrees of freedom of 541. The p-value here is 3e-06, which is less than 0.05 and it considered to be statistically significant. Then, the null hypothesis can be rejected. Therefore, µ1 (cover) ≠ µ0 (stress), the state birth rate averages are different. The 95% confidence interval also suggests that the stressed group has a significantly higher mean state birth rate than the covered group. 
+
+#### T-interval for cover and stress in state birth
+```{r}
+tint_sb_cover = t.test(x=cover$State.Births)
+tint_sb_cover
+tint_sb_stress = t.test(x=stress$State.Births)
+tint_sb_stress 
+```
+For state birth, the 95% confidence interval for covered group is (3749, 5987) and the 95% confidence interval for stressed group is (7563, 9466). The two t-intervals between the covered and stressed group are clearly separated. So, there are any disparities between the covered and stressed groups in state birth.
+
+#### T-interval for cover and stress in state rate
+```{r}
+tint_sr_cover = t.test(x=cover$State.Rate)
+tint_sr_cover
+tint_sr_stress = t.test(x=stress$State.Rate)
+tint_sr_stress 
+```
+For state rate, the 95% confidence interval for covered group is (29.3, 32.2) and the 95% confidence interval for stressed group is (34.1, 36.8). The two t-intervals between the covered and stressed group are clearly separated. So, there are any disparities between the covered and stressed groups in state rate.
+
+### Conclusion for Abstinence Scales
+Disparities between the covered and stressed groups were evident in all tests conducted. Specifically, both the mean state birth and state rate were significantly higher for the stressed group compared to the covered group.
