@@ -1,15 +1,14 @@
 ---
 title: "Project 1"
 author: "Jonathan Kratchman"
-date: "2023-03-16"
+date: "`r Sys.Date()`"
 output: html_document
 code_folding: hide
-number_sections: false
-toc: yes
-toc_depth: 3
 ---
 
 ```{r init, include=FALSE}
+library(ezids)
+library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -31,9 +30,10 @@ CDC_File<-read.csv("/Users/jonathan/Documents/GitHub/DATS6101_Project-1/Tables/N
 str(CDC_File)
 ```
  
-  Describing the structure, the year is an integer variable which posts the years for each observation. State is a character variable which lists out all 50 states and is nominal. Age groups is a categorical variable which is also character when uploaded into R. The State Birth Rate and US Birth Rate are numeric variables while the total number of births are uploaded into R as character, but which we converted into integer in the combined data. These would be interval in practice, but ratio in theory if there were a hypothetical state with no births.
+  Describing the structure, the year is an integer variable which posts the years for each observation. State is a character variable which lists out all 50 states and is nominal. Age groups is a categorical variable which is also character when uploaded into R. The State Birth Rate and US Birth Rate are numeric variables while the total number of births are uploaded into R as character, but which we converted into integer in the combined data. These would be interval in practice, but ratio in theory if there were a hypothetical state with no births. The State Birth and US Birth variables are distinct from the US and State Birth Rates as they are the raw number of births in each respective state or the US as a whole while the birth rates are births per 1,000 poeople. 
 
 **Household Income and School Enrollment**
+  
   Next, we uploaded household income data from the Census Beurau? All variables are character in this dataset. This reports the state, year, and the median household income for each state and year. In cleaning the data, we added the median household income to each state for each year from this source. NOTE ADD IN ENROLLMENT
 
 ```{r}
@@ -46,9 +46,48 @@ str(HouseHold_Income)
 
   After appending household income for each state in each year, we used the SIECUS State Profiles, a policy tracking website on sexual education laws and mandates. We categorized each state into a 1 of 3 categories. We coded "1" for a state where there is no mention of abstinence education. We coded "2" for states which covered abstinence as an option to prevent pregnancy, but students are allowed to learn about other options to prevent pregnancy such as contraceptives. Lastly, we coded "3" for states which stressed abstinence as the only option to prevent pregnancy.
 
-
 ```{r}
 DF<-read.csv("/Users/jonathan/Documents/GitHub/DATS6101_Project-1/Tables/Project1_data_clean.csv")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+**Basic Stats and Analysis**
+
+  When we ran the cleaned up data, we first examined the structure of our dataset. From there, we ran basic ststistics such as the mean and median of state births and state birth rates. From there, we made a few distributions based on the data we had. 
+  
+```{r}
+str(DF)
+mean(DF$State.Births)
+median(DF$State.Births)
+mean(DF$State.Rate)
+median(DF$State.Rate)
+mean(DF$U.S..Births)
+median(DF$U.S..Births)
+mean(DF$U.S..Birth.Rate)
+median(DF$U.S..Birth.Rate)
+```
+
+The first distribution we ran was a frequency of state births alongside a qqplot. From the outset, we observed a few outliers in births by state and decided to investigate a bit more. After a discussion amongst ourselves, we realized that a few states seemed to be driving the birth rates higher for the country. To confirm this, we used Professor Lo's ezids package which showed a more "normal" looking distribution when the outliers are excluded in the analysis. We also realized California, Texas, and Florida have higher populations and therefore, more births. We were able to confirm this with a GGPlot with Texas having the highest number of births followed by California and Florida. Interestingly, we found a similar right skewed pattern in births across all states regardless of the number of births followinfg the national births over time (FIX). 
+
+
+
+
+```{r}
+par(mfrow = c(2, 2))
+hist(DF$State.Births)
+boxplot(DF$State.Births)
+qqnorm(DF$State.Births)
+
+newStatebirth= outlierKD2(DF, State.Births, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+newEnrollment= outlierKD2(DF, Enrollment, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+str(DF)
+
+ggplot(data=DF)+
+  geom_point(mapping = aes(x=Year, y=State.Births, color=State))
+```
+
+## Limitations of Data
+
+  While these datasets gave us much insight into our research question, we found a few issues which could hinder our findings. Most importantly, when we combined and cleaned up the dataset, we found that we went from 4,680 observations to just 561. We all agreedthat this would leave us with a lower significance and confidence our findings could have truth to them. Even before running a hypothesis test, we fear that the number of observations would not allow us to reject the null hypothesis that there is no relationship between sexual education mandates and teen birth rates. While concerning, it is a reason why there is an Exploratory Data Analysis in the first place. 
+  Another important limitation we knew prior to conducting our EDA was that data on teenage pregnancies are restricted in their use due to privacy laws and regulations such as the HIPAA Privacy Rule and other provisions of HIPAA. The CDC data was aggregate by state and did not include many of the sociaoeconomic factors we needed to pull from other datasets due to these laws and regulations. This also limits the number of observations as we are looking at births at an aggregate level. Also important to note that while aggregate, we are studying teen births which involves the use of data from minors which would cause more legal and ethical implications if we were able to attain it. 
+  Moving forward, we have a few options. We could potentially use all the years in the CDC dataset which would get us to the original number of observations on teen births. We would just need to have datasets for income and education to match all the years in the CDC dataset. Conversely, we could find a new dataset on teenage pregnancies which contain more observations in our study time period, but this might be harder to find due to the sensitivity of the topic. Lastly, we could modify our research question and hypothesis to match a dataset with more observations.
