@@ -31,7 +31,7 @@ options(scientific=T, digits = 3)
 # options(scipen=9, digits = 3) 
 ```
 
-```{r}
+```{r, results='hide'}
 p1 <- read.csv(file = 'Project1_data_clean.csv')
 str(p1)
 ```
@@ -231,7 +231,7 @@ To address our research question concerning sexual education laws, we need to ex
 To further investigate, we categorized all states into two groups, covered group and stressed group. We assigned a label of 1 to the states that provide basic sex education programs, and a label of 2 to those states that have a strict approach to sex education. For states that do not have any laws regarding sex education, we assumed that they provide basic sex education programs and included them in the category 1. 
 
 #### Split Cover and Stress into Two Groups 
-```{r}
+```{r, results='hide'}
 cover <- subset(p1, Abstinence.Scales==0 | Abstinence.Scales==1) 
 str(cover)
 stress <- subset(p1, Abstinence.Scales==2) 
@@ -259,7 +259,7 @@ xkabledply(df, title="Cover vs Stress for State Birth", pos="center", bso="hover
 
 The table provides a comparison between two groups of states, categorized as `Cover` and `Stress`, based on their state birth. Looking at the data, the median state birth for the `Cover` group is 2488, while it is higher for the `Stress` group at 6756. The mean state birth for the `Cover` group is 4868, while it is higher for the `Stress` group at 8515. This indicates that the average state birth of cover is higher in the `Stress` group. The variance for the `Cover` group is 78103921, while it is slightly lower for the `Stress` group at 74614414. This indicates that the spread of state birth is slightly smaller in the `Stress` group. The standard deviation for both groups is very similar, with the `Cover` group having a standard deviation of 8838 and the `Stress` group having a standard deviation of 8638. This suggests that the distribution of state birth in both groups is roughly the same. Overall, the table suggest that there are differences in state rate between states that provide basic sex education programs and states that have a strict approach to sex education. However, the differences are not very large and there is overlap between the two groups. 
 
-#### Descriptive Statistics of Both Group for State Birth
+#### Descriptive Statistics of Both Group for State Rate
 ```{r, results='hide'}
 summary(cover$State.Rate)
 summary(stress$State.Rate)
