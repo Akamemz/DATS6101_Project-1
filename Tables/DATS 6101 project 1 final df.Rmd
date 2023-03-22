@@ -1,0 +1,466 @@
+---
+title: "DATS 6101 project 1 final df"
+author: "Team 1: Jonathan Kratchman, Xue Ming Wang, Timur Abdygulov"
+date: "2023-03-22"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes some helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# You will need to install it (once) from GitHub.
+# library(devtools)
+# devtools::install_github("physicsland/ezids")
+# Then load the package in your R session.
+library(ezids)
+```
+
+```{r setup, include=FALSE}
+# Some of common RMD options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# Can globally set option for number display format.
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+```
+# Project 1 Summary Paper:
+# Introdction
+
+  We are researching the relationship between teenage pregnancy and the "strictness" of abstinence education in each state's curriculum. Across the country, many states have laws which mandate abstinence as being a part of the sexual education curriculum either requiring abstinence being taught as the only option to prevent pregnancy or as one of many options including contraceptive use to prevent pregnancy (SIECUS, 2022).
+  
+  This research is more than timely as there are conflicts between schools, parents, and politicians on how these sensitive topics, including sexual education are taught. There currently are talking points and in some states, laws around requiring teachers to teach from one point of view only which also includes sexual education (Christen Jones, 2022). Looking at the teenage pregnancy rate in relationship to these policies will allow us some insight into what the correct method is to prevent teenage pregnancies which in itself is a public health crisis (Scally, 2002).
+  
+# Analysis has already been completed related to the content in our dataset
+Researchers and policymakers are concerned about the high incidence of adolescent pregnancies
+and sexually transmitted diseases (STDs) in the United States compared to other industrialized
+nations. The authors of a 2011 study titled "Abstinence-Only Education and Adolescent
+Pregnancy Rates: Why We Need Comprehensive Sex Education in the U.S.", Kathrin F. Stanger-
+Hall and David W., make the case for the need of comprehensive sex education in lowering
+adolescent pregnancies and STDs.
+
+The article looks at the current discussion of whether or not abstinence-only teaching or
+comprehensive sex education should be taught in American public schools. Programs to promote
+abstinence have been funded by the federal government, but evidence shows that they are
+ineffectual at reducing the incidence of teen pregnancies. State-by-state data reveals, however, that since it encourages abstinence as a desired habit, comprehensive sex education is linked to the lowest frequency of teen pregnancies. The authors advise that comprehensive sex and HIV/STD education be included in middle and high school biology and social studies
+curriculum.
+
+Stanger-Hall and David W. reference a research that examined data from 48 states, including
+figures on adolescent pregnancies, births, and abortions, as well as information on the focus on abstinence in state laws and regulations, to support their claim. Higher levels of education are linked to decreased rates of teen pregnancy, childbirth, and abortion, according to the study. The study examined four additional possible confounding variables in addition to the focus on abstinence: socioeconomic status, educational attainment, teen population's racial/ethnic makeup, and Medicaid waivers for family planning. The researchers discovered that providing lowincome women and teenagers with Medicaid-funded access to family planning services and contraception can lower the prevalence of unintended births.
+
+The authors looked at these factors' correlations with state-by-state teen pregnancy rates using statistical analysis. Both parametric and non-parametric Spearman correlations were used to evaluate the relationships between the variables, and the results were identical in both cases. In their multivariate analysis, they also utilized MANOVA and MANCOVA, and when comparing pairs of abstinence levels, they used the Bonferroni adjustment for multiple comparisons. The authors reported the estimated marginal mean adolescent birth and pregnancy rates after accounting for covariates.
+
+Overall, the studies discussed in the paper provide compelling support for the benefits of
+thorough sexuality education in promoting healthy sexual behavior, reducing teen pregnancies,
+and avoiding STDs. The authors present a strong case against teaching abstinence-only based on
+statistics and highlight the necessity for legislators,
+
+# Data Used
+## CDC Data set
+
+For the core of our data, we used the CDC's National Center for Health Statistic's dashboard "U.S. and State Trends on Teen Births, 1990–2019". This is a comprehensive data set displaying the year, state, age groups of the people studied from 15 to 17, 15 to 19, and 18 to 19 years old. In addition, the state number of state births and state birth rate per 1000 people each year is reported as well as the number of births nationwide along with the birthrate for the country. 
+  
+  
+```{r}
+CDC_File<-read.csv("NCHS_-_U.S._and_State_Trends_on_Teen_Births.csv")
+
+str(CDC_File)
+```
+ 
+  Describing the structure, the year is an integer variable which posts the years for each observation. State is a character variable which lists out all 50 states and is nominal. Age groups is a categorical variable which is also character when uploaded into R. The State Birth Rate and US Birth Rate are numeric variables while the total number of births are uploaded into R as character, but which we converted into integer in the combined data. These would be interval in practice, but ratio in theory if there were a hypothetical state with no births. The State Birth and US Birth variables are distinct from the US and State Birth Rates as they are the raw number of births in each respective state or the US as a whole while the birth rates are births per 1,000 people. 
+
+### Household Income and School Enrollment
+  
+  Next, we uploaded household income data from the US Census Bureau. All variables are character in this data set. This reports the state, year, and the median household income for each state and year. In cleaning the data, we added the median household income to each state for each year from this source which we converted to numeric. Enrollment data is from the National Center for Education Statistics through the US Department of Education using 2017 data. This data set records total school enrollment in each year by state, region, and jurisdiction. It also records the projected enrollment from the year it was published for the first four years after publication and 10 years after publication of that year's data set. 
+
+```{r}
+HouseHold_Income<-read.csv("Median_Household_Income-h08.csv")
+
+str(HouseHold_Income)
+```
+
+### Abstinence Mandates and Cleaned Data Set 
+
+  After appending household income for each state in each year, we used the SIECUS State Profiles, a policy tracking website on sexual education laws and mandates. We categorized each state into a 1 of 3 categories. We coded "1" for a state where there is no mention of abstinence education. We coded "2" for states that covered abstinence as an option to prevent pregnancy, but students are allowed to learn about other options such as contraceptives. Lastly, we coded "3" for states which stressed abstinence as the only option to prevent pregnancy.
+
+```{r}
+DF<-read.csv("Project1_data_clean.csv")
+```
+
+
+### Basic Stats and Analysis
+
+  When we ran the cleaned up data, we first examined the structure of our data set. From there, we ran basic statistics such as the mean and median of state births and state birth rates. From there, we made a few distributions based on the data we had. 
+  
+```{r}
+str(DF)
+mean(DF$State.Births)
+median(DF$State.Births)
+mean(DF$State.Rate)
+median(DF$State.Rate)
+mean(DF$U.S..Births)
+median(DF$U.S..Births)
+mean(DF$U.S..Birth.Rate)
+median(DF$U.S..Birth.Rate)
+```
+
+The first distribution we ran was a frequency of state births alongside a qqplot. From the outset, we observed a few outliers in births by state and decided to investigate a bit more. After a discussion among ourselves, we realized that a few states seemed to be driving the birth rates higher for the country. To confirm this, we used Professor Lo's ezids package which showed a more "normal" looking distribution when the outliers are excluded from the analysis. We also realized California, Texas, and Florida have higher populations and therefore, more births. We were able to confirm this with a GGPlot with Texas having the highest number of births followed by California and Florida. Interestingly, we found a similar right skewed pattern in births across all states regardless of the number of births following the national births over time. 
+
+```{r}
+library(ggplot2) 
+par(mfrow = c(2, 2))
+hist(DF$State.Births)
+boxplot(DF$State.Births)
+qqnorm(DF$State.Births)
+```
+
+# Limitations of Data
+
+  While these data sets gave us much insight into our research question, we found a few issues which could hinder our findings. Most importantly, when we combined and cleaned up the data set, we found that we went from 4,680 observations to just 561. We all agreed that this would leave us with a lower significance and confidence our findings could have truth to them. Even before running a hypothesis test, we fear that the number of observations would not allow us to reject the null hypothesis that there is no relationship between sexual education mandates and teen birth rates. While concerning, it is a reason why there is an Exploratory Data Analysis in the first place. 
+  Another important limitation we knew prior to conducting our EDA was that data on teenage pregnancies are restricted in their use due to privacy laws and regulations such as the HIPAA Privacy Rule and other provisions of HIPAA. The CDC data was aggregate by state and did not include many of the socioeconomic factors we needed to pull from other data sets due to these laws and regulations. This also limits the number of observations as we are looking at births at an aggregate level. Also important to note that while aggregate, we are studying teen births which involves the use of data from minors which would cause more legal and ethical implications if we were able to attain it. 
+  Moving forward, we have a few options. We could potentially use all the years in the CDC data set which would get us to the original number of observations on teen births. We would just need to have data sets for income and education to match all the years in the CDC data set. Conversely, we could find a new data set on teenage pregnancies which contain more observations in our study time period, but this might be harder to find due to the sensitivity of the topic. Lastly, we could modify our research question and hypothesis to match a data set with more observations.
+
+
+
+# Technical Analysis
+
+```{r, results='hide'}
+p1 <- read.csv(file = 'Project1_data_clean.csv')
+str(p1)
+```
+
+## Dataset summary
+
+The dataset consists data regarding the birth rates of teenagers aged 15-19 in all 51 states of the United States, including the District of Columbia, spanning from the year 2005 to 2015.
+
+Variable |  Definition  
+  :-:    |  :-- 
+Year  | The year of the data collection: 2005-2015 
+State | 51 state or district in USA
+Abstinence.Scales | A score on a scale from 0 to 2, indicating the extent to which abstinence is emphasized in sex education in that state, where 0 means no law mentioned, 1 means covered basic sex education program, and 2 means covered sex education program in strict manner.
+Age.Group..Years. | The age group, which is 15-19 years in this dataset
+State.Rate | Birth rate for each state for a particular year
+State.Births | Number of Birth per State (per 1000)
+U.S..Births | Birth rate in U.S (per 1000)
+U.S..Birth.Rate | Birth rate for U.S for a particular year 
+Unit | The unit of measurement for the state birth and US birth (per 1000)
+Median.Household.Income | The median income of households per state in current dollar
+Enrollment | The total number of students enrolled in USA secondary schools 
+
+## Descriptive Statistics
+
+```{r, results='hide'}
+p1firsthalf<- data.frame(p1$Year, p1$State, p1$Abstinence.Scales, p1$Age.Group..Years., p1$State.Rate, p1$State.Births)
+p2secondhalf <- data.frame( p1$U.S..Births, p1$U.S..Birth.Rate, p1$Unit, p1$Median.Household.Income, p1$Enrollment)
+```
+The table here represents an overview of all 11 variables and 561 observations.
+```{r}
+xkablesummary(p1firsthalf, title="Table: Statistics summary")
+xkablesummary(p2secondhalf, title="Table: Statistics summary")
+```
+
+## Overall Trend
+
+### Year vs US Births
+```{r}
+library(ggplot2) 
+ggplot(data=p1, aes(x=Year, y=U.S..Births, color = "red", group=1)) +
+  geom_line()+
+  geom_point()+
+  labs(x = "Year", y = "Number of US Births", title = "US Births by Year", caption = "Figure 1. Trend of US Births over time")
+```
+
+The plot (figure 1) shows that the number of US births has declined over time. The number of births peaked in 2007 and reached its lowest point in 2015. The trend presented that US births was generally decreasing from 2005 to 2015.
+
+## Normality Tests
+We have conducted normality tests on the distributions of the all variables with histogram, boxplot and qq-plot, and identified that two of them are not normally distributed. 
+
+### Distribution of State.Births 
+```{r, fig.keep = "none"}
+hist(p1$State.Births, main="Histogram of State Birth")
+boxplot(p1$State.Births, main="Boxplot of State Birth")
+qqnorm(p1$State.Births, main="QQ-plot of State Birth" )
+qqline(p1$State.Births )
+```
+Figure 2. With vs Without Outliers in state birth
+```{r}
+newStatebirth = outlierKD2(p1, State.Births, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+```
+
+One of the variables is the state birth. The plots with outleries (Figure 2) was found to be right-skewed with many outliers. Removing the outliers led to a noticeable improvement in the distribution (Figure 2), although there still appears to be a slight light tail. It may be worth considering further transformations of the variable, like log transformation, to account for the deviation from normality in future research. 
+
+### Distribution of Enrollment 
+```{r, fig.keep = "none"}
+hist(p1$Enrollment, main="Histogram of Enrollment")
+boxplot(p1$Enrollment, main="Histogram of Enrollment")
+qqnorm(p1$Enrollment, main="Histogram of Enrollment")
+qqline(p1$Enrollment, main="Histogram of Enrollment")
+```
+
+Figure 3. With vs Without Outliers in Enrollment
+```{r}
+newEnrollment = outlierKD2(p1, Enrollment, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+```
+
+Enrollment is another variable that exhibits a non-normal distribution, displaying a right-skewed pattern (figure 3). However, after the outliers have been addressed, the distribution appears to be more normal than previous plots. It is possible that the presence of outliers in the enrollment data may be attributed to various reasons, such as teens frequently moving in and out of the school. Factors such as school absenteeism, transfer to another school, or re-enrollment could potentially contribute to the occurrence of outliers among teenagers.
+
+### With vs Without Outliers 
+```{r, results='hide'}
+# Building new dataframe
+Year<-p1$Year
+State<-p1$State
+Abstinence.Scales<-p1$Abstinence.Scales
+State.Rate<-p1$State.Rate
+newStatebirth<-newStatebirth$State.Births
+U.S..Births<-p1$U.S..Births
+U.S..Birth.Rate<- p1$U.S..Birth.Rate
+Unit <- p1$Unit 
+Median.Household.Income <-p1$ Median.Household.Income
+newEnrollment<-newEnrollment$Enrollment
+
+df<- data.frame(Year,State, Abstinence.Scales, State.Rate, newStatebirth, U.S..Births, U.S..Birth.Rate, Unit, Median.Household.Income, newEnrollment)
+summary(df)
+df<-na.omit(df)
+```
+
+```{r}
+par(mfrow=c(2,1))
+ggplot(p1, aes(x=Year, y=U.S..Birth.Rate))+geom_col(fill="Dark Orange")+
+  labs(title = "US Birthrate with Outliers", caption = "Figure 4. US Birthrate with Outliers")
+ggplot(df, aes(x=Year, y=newStatebirth))+geom_col(fill="Dark Green")+
+labs(title = "US Birthrate without Outliers", caption = "Figure 5. US Birthrate without Outliers")
+```
+
+The two plots showed analogous trends, indicating a consistent decrease in the birth rate in the United States from 2007 to 2015, regardless of the presence or absence of outliers.
+
+### Dealing with Outliers
+
+Removing all the outliers can be an option to deal with outliers. On the other hand, it is important to carefully consider the reason for the outliers before removing them, as this could impact the validity of the results.
+
+#### State Birth Outliers
+```{r, results='hide', fig.keep = 'none'}
+newStatebirth= outlierKD2(p1, State.Births, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+outSB = subset(newStatebirth, is.na(State.Births)) 
+xkabledplyhead(outSB, title = "Outlier States for State Birth")
+```
+
+```{r}
+library(maps)
+library(ggplot2)
+
+us_map <- map_data("state")
+
+highlight_states <- c("california", "texas", "florida")
+
+ggplot() +
+  geom_polygon(data = us_map, aes(x = long, y = lat, group = group, fill = ifelse(region %in% highlight_states, region, "Other")),
+               color = "black") +
+  theme_void() +
+  coord_map() +
+  scale_fill_manual(values = c("california" = "red", "texas" = "blue", "florida" = "green", "Other" = "white"), name = "fill_color") +
+  labs(title = "Outlier States for state birth", caption = "Figure 6. Outlier States for state birth")
+```
+
+During our examination of state birth outliers, it became evident that the majority of these outliers occur in three particular states: California, Florida, and Texas (Figure 6). In comparison to other states, these three states exhibit substantially higher rates of teen pregnancy. 
+
+#### Year vs State Births
+```{r}
+library(ggplot2) 
+ggplot(data=p1)+
+  geom_point(mapping = aes(x=Year, y=State.Births, color=State))+
+  labs(title = "Scatterplot of State Birth in TP", caption = "Figure 7. Scatterplot of State Birth")
+```
+
+As depicted in Figure 7, although California, Florida, and Texas (the outlier states) have a higher number of births compared to other states, they still display a trend similar to that of other states, which is a decrease trendin the number of teen pregnancies over the years.
+
+Alternatively, if we observe outliers in California, Florida, and Texas with respect to teen pregnancy rates, it is important to note that the high populations of these states could be a contributing factor to the outliers. Therefore, it may not be appropriate to simply delete these outliers without further investigation. Instead, we should consider conducting more in-depth analysis to determine the underlying causes of the high teen pregnancy rates in these states. It is possible that various demographic, socio-economic, or cultural factors could be at play, and understanding these factors could inform targeted interventions to reduce the prevalence of teen pregnancy in these states. For further research on the outliers in California, Florida, and Texas, we would consider incorporating the overall teenage population in each states to see the proportion between teenage population and state birth. This would allow us to better understand the prevalence of teen pregnancy within each state and determine the extent to which it contributes to overall state rates.
+
+#### Enrollment Outliers
+```{r, results='hide', fig.keep = 'none'}
+newEnrollment= outlierKD2(p1, Enrollment, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+outE = subset(newEnrollment, is.na(Enrollment)) 
+xkabledplyhead(outE, title = "Outlier States for Enrollment")
+```
+
+```{r}
+library(maps)
+library(ggplot2)
+
+us_map <- map_data("state")
+
+highlight_states <- c("california", "texas", "florida", "new york")
+
+ggplot() +
+  geom_polygon(data = us_map, aes(x = long, y = lat, group = group, fill = ifelse(region %in% highlight_states, region, "Other")),
+               color = "black") +
+  theme_void() +
+  coord_map() +
+  scale_fill_manual(values = c("california" = "red", "texas" = "blue", "florida" = "green", "new york" = "orange", "Other" = "white"), name = "fill_color") +
+  labs(title = "Outlier States for Enrollment", caption = "Figure 8. Outlier States for Enrollment")
+```
+
+
+During our examination of Enrollment outliers, it became evident that the majority of these outliers occur in four particular states: California, Florida, New York and Texas (Figure 8). In comparison to other states, these three states exhibit substantially higher frequency of enrollment. 
+
+Just like the outliers for state birth, regarding the outliers observed in the enrollment data of California, Florida, New York, and Texas, it may not be appropriate to simply delete them. Instead, it would be better to investigate more on the reasons for these outliers and determine whether they are indicative of any underlying issues related to student mobility or other factors. 
+
+
+## Abstinence Scales
+Next, we will analyze the correlation between the abstinence rates of each state and their respective birth rates.
+
+### State.Births vs State
+```{r}
+library(ggplot2) 
+ggplot(data=p1)+
+  geom_point(mapping = aes(x=State.Births, y=State, color=Abstinence.Scales))+
+  labs(title = "State births by State Accounting for Abstinence Education", caption = "Figure 9. State births by State Accounting for Abstinence Education")
+```
+
+Figure 9 displayed a scatter plot depicting the state births of each state alongside their corresponding abstinence scales. However, no discernible patterns were observed in the plot, and it indicates the need for further analysis of different abstinence scale groups.
+
+### Difference Between Cover vs Stress
+To address our research question concerning sexual education laws, we need to examine whether various laws have an impact on state birth and state rate. Therefore, we will undertake the required steps to test whether there are any disparities between the covered and stressed groups.
+
+To further investigate, we categorized all states into two groups, covered group and stressed group. We assigned a label of 1 to the states that provide basic sex education programs, and a label of 2 to those states that have a strict approach to sex education. For states that do not have any laws regarding sex education, we assumed that they provide basic sex education programs and included them in the category 1. 
+
+#### Split Cover and Stress into Two Groups 
+```{r, results='hide'}
+cover <- subset(p1, Abstinence.Scales==0 | Abstinence.Scales==1) 
+str(cover)
+stress <- subset(p1, Abstinence.Scales==2) 
+str(stress)
+```
+
+
+#### Descriptive Statistics of Both Group for State Birth
+```{r, results='hide'}
+summary(cover$State.Births)
+summary(stress$State.Births)
+var(cover$State.Births)
+var(stress$State.Births)
+sd(cover$State.Births)
+sd(stress$State.Births)
+```
+
+```{r}
+Title= c("Min", "1st Qu",  "Median",    "Mean", "3rd Qu",  "Max", "Variance", "SD")
+Cover=c(245 ,    922   , 2488 ,   4868 ,   4429,   53417, 78103921,8838)
+Stress=c(530,    3778,    6756,    8515,   10063,   54284, 74614414,8638)
+df=data.frame(Title, Cover, Stress)
+xkabledply(df, title="Cover vs Stress for State Birth", pos="center", bso="hover" )
+```
+
+The table provides a comparison between two groups of states, categorized as `Cover` and `Stress`, based on their state birth. Looking at the data, the median state birth for the `Cover` group is 2488, while it is higher for the `Stress` group at 6756. The mean state birth for the `Cover` group is 4868, while it is higher for the `Stress` group at 8515. This indicates that the average state birth of cover is higher in the `Stress` group. The variance for the `Cover` group is 78103921, while it is slightly lower for the `Stress` group at 74614414. This indicates that the spread of state birth is slightly smaller in the `Stress` group. The standard deviation for both groups is very similar, with the `Cover` group having a standard deviation of 8838 and the `Stress` group having a standard deviation of 8638. This suggests that the distribution of state birth in both groups is roughly the same. Overall, the table suggest that there are differences in state rate between states that provide basic sex education programs and states that have a strict approach to sex education. However, the differences are not very large and there is overlap between the two groups. 
+
+#### Descriptive Statistics of Both Group for State Rate
+```{r, results='hide'}
+summary(cover$State.Rate)
+summary(stress$State.Rate)
+var(cover$State.Rate)
+var(stress$State.Rate)
+sd(cover$State.Rate)
+sd(stress$State.Rate)
+```
+
+```{r}
+Title= c("Min", "1st Qu",  "Median",    "Mean", "3rd Qu",  "Max", "Variance", "SD")
+Cover=c(9.4,    22.1  ,  29.6,    30.7  ,  38.7,    63.9 , 126,11.2)
+Stress=c(12.1,    25.7,    33.5,    35.4,    43.5,    70.1,152, 12.3)
+df=data.frame(Title, Cover, Stress)
+xkabledply( df, title="Cover vs Stress for state rate", pos="center", bso="hover" )
+```
+
+The table provides a comparison between two groups of states, categorized as `Cover` and `Stress`, based on their state rates. The median birth rate for the `Cover` group is 29.6, and for the `Stress` group  is 33.5. The mean birth rate for the `Cover` group is 30.7, while for the `Stress` group is 35.4. This means that the average birth rate is higher in the `Stress` group than in the `Cover` group. The variance for the `Cover` group is 126.0, while for the `Stress` group it is 152.0. This means that the spread of birth rates is slightly larger in the `Stress` group than in the `Cover` group. The standard deviation for the `Cover` group is 11.2, while for the `Stress` group it is 12.3. This means that the distribution of birth rates in both groups is roughly the same, but slightly more spread out in the `Stress` group. Overall, the table suggests that there are differences in birth rates between states with basic sex education programs and those with a strict approach to sex education. The `Stress` group has a slightly higher average birth rate and a slightly larger spread of birth rates, but the differences are not very large. Moreover, `Stress` group seems to have higher state rate than `Cover` group.  
+
+Whether the two groups are the same is still not clear. We need more testing to be verified. To do so, the t-test and t-interval will be able to analyze the mean of the two groups in further detail.
+
+
+
+#### T-test for Cover and Stress in State Birth
+The null hypothesis here is that, µ1 (cover) = µ0 (stress), the state birth averages are the same. The alternative hypotheses is, µ1 (cover) ≠ µ0 (stress), the state birth averages are different.
+```{r}
+t_state_birth = t.test(cover$State.Births, stress$State.Births, conf.level=0.95)
+t_state_birth
+```
+The result indicates a t-value of -5 and a degrees of freedom of 513. The p-value here is 1e-06, which is less than 0.05 and it considered to be statistically significant. Then, the null hypothesis can be rejected. Therefore, µ1 (cover) ≠ µ0 (stress), the state birth averages are different. The 95% confidence interval also suggests that the stressed group has a significantly higher mean state birth than the covered group.
+
+#### T-test for Cover and Stress in State Rate
+The null hypothesis here is that, µ1 (cover) = µ0 (stress), the state rate averages are the same. The alternative hypotheses is, µ1 (cover) ≠ µ0 (stress), the state rate averages are different.
+```{r}
+t_state_rate = t.test(cover$State.Rate , stress$State.Rate, conf.level=0.95)
+t_state_rate
+```
+The result indicates a t-value of -5 and a degrees of freedom of 541. The p-value here is 3e-06, which is less than 0.05 and it considered to be statistically significant. Then, the null hypothesis can be rejected. Therefore, µ1 (cover) ≠ µ0 (stress), the state rate averages are different. The 95% confidence interval also suggests that the stressed group has a significantly higher mean state rate than the covered group. 
+
+#### T-interval for Cover and Stress in State Birth
+```{r}
+tint_sb_cover = t.test(x=cover$State.Births)
+tint_sb_cover
+tint_sb_stress = t.test(x=stress$State.Births)
+tint_sb_stress 
+```
+For state birth, the 95% confidence interval for covered group is (3749, 5987) and the 95% confidence interval for stressed group is (7563, 9466). The two t-intervals between the covered and stressed group are clearly separated. So, there are disparities between the covered and stressed groups in state birth.
+
+#### T-interval for Cover and Stress in State Rate
+```{r}
+tint_sr_cover = t.test(x=cover$State.Rate)
+tint_sr_cover
+tint_sr_stress = t.test(x=stress$State.Rate)
+tint_sr_stress 
+```
+For state rate, the 95% confidence interval for covered group is (29.3, 32.2) and the 95% confidence interval for stressed group is (34.1, 36.8). The two t-intervals between the covered and stressed group are clearly separated. So, there are disparities between the covered and stressed groups in state rate.
+
+### Correlation Between Abstinence.Scales, State.Births, State.Rate 
+```{r}
+corp1 <- data.frame(p1$Abstinence.Scales, p1$State.Rate, p1$State.Births)
+cor1 <- cor(corp1)
+cor1
+```
+The result indicates that the correlation coefficient between `Abstinence Scales` and `State Rate` is 0.146, which indicates a weak positive correlation. The correlation coefficient between `Abstinence Scales` and `State Births` is 0.245, which also indicates a weak positive correlation.  It can be concluded that the correlations between these variables are weak, indicating that there is no strong relationship between `Abstinence Scales`, `State Rate`, and `State Births`. However, the positive correlations suggest that as one variable increases, other variable tends to increase as well, but the strength of this relationship is not very strong.
+
+### Conclusion for Abstinence Scales
+Disparities between the covered and stressed groups were evident in all tests conducted. Specifically, both the mean state birth and state rate were significantly higher for the stressed group compared to the covered group. In general, the connections among `Abstinence Scales`, `State Rate`, and `State Births` are weak. Nonetheless, their relationship still requires further investigation with a linear model.
+
+# Additional Information Needed
+While the dataset we are using provides a valuable starting point for investigating the impact of sexual education laws on teen pregnancy rates, there are several areas where additional information would be beneficial. Some of the additional information that could be useful for our research includes: 
+
+1) Short time period - Although our dataset spans a decade, longer-term data spanning many decades would give a more complete picture of changes in teen pregnancy rates and the effects of sexual education legislation.
+
+2) Information on the teen moms' racial, ethnic, social, or educational background would help us understand the factors that influence teen pregnancy in a more nuanced way.
+
+3) Information on sexual education programs, access to contraception, and contraception would help shed greater light on the impact that each of these elements has in lowering adolescent pregnancy rates.
+
+4) Information about pregnancy outcomes about the outcomes of teen pregnancies, such as preterm birth, low birth weight, or maternal complications, would help to contextualize the impact of sexual education laws on teen health and well-being.
+
+# Changed Research Question after EDA
+After going through EDA process, we have refined our question to “Did sexual education laws
+lead to an increase or decrease in teen pregnancy rates from 2005 to 2015 by state in the US?”
+making it more specific and focused. Limiting out time frame to 10 years from 2005 to 2015 and
+targeting only one age group from 15-19 years old. Those limits will help us analyze and
+interpret the data more efficiently. Additionally, we included for sexual education abstinence
+scales as a factor variable to assess impact on teen pregnancy rates.
+
+# Protential Answer for Research Question
+First Teen pregnancy rates and regulations requiring sexual education do not correlate well. Second, from 2005 to 2015, teen pregnancy rates in the US per state appeared to rise as a result of sexual education regulations.
+
+# References:
+Centers for Disease Control and Prevention. (2022, February 17). Teen Birth Rates Data Visualization. National Center for Health Statistics. https://www.cdc.gov/nchs/data-visualization/teen-births/
+
+Christen Jones, Z. (2022, Mar 28,). Florida governor ron DeSantis signs "parental rights in education" bill into law — known by critics as "don't say gay" bill . CBS News, Retrieved from https://www.cbsnews.com/news/florida-desantis-dont-say-gay-bill-signed-parental-rights-in-education/
+
+Darroch, J. E., Singh, S., & Frost, J. J. (2001). Differences in Teenage Pregnancy Rates among Five Developed Countries: The Roles of Sexual Activity and Contraceptive Use. Family Planning Perspectives, 33(6), 244–281. https://doi.org/10.2307/3030191
+
+Historical income tables: Households.  (2022 August 18). Table H-8: Median Household Income by State: 1984 to 2018. Bureau, U. S. C. Census.gov. https://www.census.gov/data/tables/time-series/demo/income-poverty/historical-income-households.html 
+
+National Center for Education Statistics. (2018). Table 203.20: High school graduates, by race/ethnicity and state or jurisdiction: 2015-16. In Digest of Education Statistics: 2017 (50th ed., pp. 148-149). U.S. Department of Education. https://nces.ed.gov/programs/digest/d17/tables/dt17_203.20.asp
+
+Scally, G. (2002). Too much too young? teenage pregnancy is a public health, not a clinical, problem. International Journal of Epidemiology, 31(3), 554-555. doi:10.1093/ije/31.3.554
+Sex ed state law and policy chart: SIECUS state profiles: July 2022(2022).
+
+Sexuality Information and Education Council of the United States. (2020). SIECUS 2020 Sex Ed State Law and Policy Chart. https://siecus.org/wp-content/uploads/2020/05/SIECUS-2020-Sex-Ed-State-Law-and-Policy-Chart_May-2020-3.pdf
