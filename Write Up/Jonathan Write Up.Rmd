@@ -34,7 +34,7 @@ str(CDC_File)
 
 **Household Income and School Enrollment**
   
-  Next, we uploaded household income data from the Census Beurau? All variables are character in this dataset. This reports the state, year, and the median household income for each state and year. In cleaning the data, we added the median household income to each state for each year from this source. Enrollment data is from the 2017? (insert source). This dataset records total school enrollment in each year by state, region, and jurisdiction. It also records the projected enrollment from the year it was published for the first four years after publication and 10 years after publication of that year's dataset
+  Next, we uploaded household income data from the Census Beurau? All variables are character in this dataset. This reports the state, year, and the median household income for each state and year. In cleaning the data, we added the median household income to each state for each year from this source. Enrollment data is from the National Center for Education Statistics through the US Department of Education using 2017 data. This dataset records total school enrollment in each year by state, region, and jurisdiction. It also records the projected enrollment from the year it was published for the first four years after publication and 10 years after publication of that year's dataset. 
 
 ```{r}
 HouseHold_Income<-read.csv("/Users/jonathan/Documents/GitHub/DATS6101_Project-1/Tables/Median_Household_Income-h08.csv")
