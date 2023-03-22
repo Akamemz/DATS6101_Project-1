@@ -43,18 +43,18 @@ and sexually transmitted diseases (STDs) in the United States compared to other 
 nations. The authors of a 2011 study titled "Abstinence-Only Education and Adolescent
 Pregnancy Rates: Why We Need Comprehensive Sex Education in the U.S.", Kathrin F. Stanger-
 Hall and David W., make the case for the need of comprehensive sex education in lowering
-adolescent pregnancies and STDs.
+adolescent pregnancies and STDs (Stanger-Hall, 2011).
 
 The article looks at the current discussion of whether or not abstinence-only teaching or
 comprehensive sex education should be taught in American public schools. Programs to promote
 abstinence have been funded by the federal government, but evidence shows that they are
 ineffectual at reducing the incidence of teen pregnancies. State-by-state data reveals, however, that since it encourages abstinence as a desired habit, comprehensive sex education is linked to the lowest frequency of teen pregnancies. The authors advise that comprehensive sex and HIV/STD education be included in middle and high school biology and social studies
-curriculum.
+curriculum (Stanger-Hall, 2011).
 
 Stanger-Hall and David W. reference a research that examined data from 48 states, including
-figures on adolescent pregnancies, births, and abortions, as well as information on the focus on abstinence in state laws and regulations, to support their claim. Higher levels of education are linked to decreased rates of teen pregnancy, childbirth, and abortion, according to the study. The study examined four additional possible confounding variables in addition to the focus on abstinence: socioeconomic status, educational attainment, teen population's racial/ethnic makeup, and Medicaid waivers for family planning. The researchers discovered that providing lowincome women and teenagers with Medicaid-funded access to family planning services and contraception can lower the prevalence of unintended births.
+figures on adolescent pregnancies, births, and abortions, as well as information on the focus on abstinence in state laws and regulations, to support their claim. Higher levels of education are linked to decreased rates of teen pregnancy, childbirth, and abortion, according to the study. The study examined four additional possible confounding variables in addition to the focus on abstinence: socioeconomic status, educational attainment, teen population's racial/ethnic makeup, and Medicaid waivers for family planning. The researchers discovered that providing lowincome women and teenagers with Medicaid-funded access to family planning services and contraception can lower the prevalence of unintended births (Stanger-Hall, 2011).
 
-The authors looked at these factors' correlations with state-by-state teen pregnancy rates using statistical analysis. Both parametric and non-parametric Spearman correlations were used to evaluate the relationships between the variables, and the results were identical in both cases. In their multivariate analysis, they also utilized MANOVA and MANCOVA, and when comparing pairs of abstinence levels, they used the Bonferroni adjustment for multiple comparisons. The authors reported the estimated marginal mean adolescent birth and pregnancy rates after accounting for covariates.
+The authors looked at these factors' correlations with state-by-state teen pregnancy rates using statistical analysis. Both parametric and non-parametric Spearman correlations were used to evaluate the relationships between the variables, and the results were identical in both cases. In their multivariate analysis, they also utilized MANOVA and MANCOVA, and when comparing pairs of abstinence levels, they used the Bonferroni adjustment for multiple comparisons. The authors reported the estimated marginal mean adolescent birth and pregnancy rates after accounting for covariates (Stanger-Hall, 2011).
 
 Overall, the studies discussed in the paper provide compelling support for the benefits of
 thorough sexuality education in promoting healthy sexual behavior, reducing teen pregnancies,
@@ -464,3 +464,5 @@ Scally, G. (2002). Too much too young? teenage pregnancy is a public health, not
 Sex ed state law and policy chart: SIECUS state profiles: July 2022(2022).
 
 Sexuality Information and Education Council of the United States. (2020). SIECUS 2020 Sex Ed State Law and Policy Chart. https://siecus.org/wp-content/uploads/2020/05/SIECUS-2020-Sex-Ed-State-Law-and-Policy-Chart_May-2020-3.pdf
+
+Stanger-Hall KF, Hall DW. Abstinence-only education and teen pregnancy rates: why we need comprehensive sex education in the U.S. PLoS One. 2011;6(10):e24658. doi: 10.1371/journal.pone.0024658. Epub 2011 Oct 14. PMID: 22022362; PMCID: PMC3194801.
