@@ -1,0 +1,132 @@
+---
+title: "Project2_data_R"
+author: "Timur Abdygulov"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+```{r}
+library(ezids)
+library(ggplot2)
+
+data <- read.csv("/Users/tima/Desktop/DATS_6101/Project #2/project2_data.csv")
+
+```
+
+
+
+```{r}
+
+library(dplyr)
+# define which columns to convert to categorical
+cols_to_convert <- c('abstinence', 'abortionban_anomaly', 'abortionban_sex', 'substance_poli', 'year', 'state')
+
+# convert specified columns to factors
+data <- data %>% 
+  mutate_if(names(.) %in% cols_to_convert, as.factor)
+
+str(data)
+```
+
+For 15-19 age group
+y(Dependent variable):pregnancyrate1519
+x(Independent variable): state+ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal
+
+
+```{r}
+library(rpart)
+library(rattle)
+
+# fit the classification tree
+regtree1 <- rpart(pregnancyrate1519 ~ state + abstinence + abortionban_anomaly + abortionban_sex + substance_poli + year + abortionrate1519 + birthrate1519 + abortionratio1519 + pregnancies1519 + abortions1519 + births1519 + miscarriages1519 + population1519 + population1544 + abortionstotal + birthstotal + pregnancyratetotal + birthratetotal + abortionratetotal + abortionratiototal + miscarriagestotal + pregnanciestotal, data = data, method = "anova")
+
+# plot the tree
+plot(regtree1)
+text(regtree1)
+
+fancyRpartPlot(regtree1)
+```
+
+
+```{r}
+my.tree = tree(pregnancyrate1519 ~ state + abstinence + abortionban_anomaly + abortionban_sex + substance_poli + year + abortionrate1519 + birthrate1519 + abortionratio1519 + pregnancies1519 + abortions1519 + births1519 + miscarriages1519 + population1519 + population1544 + abortionstotal + birthstotal + pregnancyratetotal + birthratetotal + abortionratetotal + abortionratiototal + miscarriagestotal + pregnanciestotal, data=data) # Fits tree 
+prune.tree(my.tree,best=5) # Returns best pruned tree 
+prune.tree(my.tree,best=5, newdata=data)  # no test data set, so use training data
+my.tree.seq = prune.tree(my.tree) # Sequence of pruned 
+# tree sizes/errors
+plot(my.tree.seq) # Plots error/deviance vs size of tree (# of terminal nodes being used.)
+
+
+```
+
+
+
+
+For 15 age group
+y(Dependent variable): pregnancyratelt15 
+x(Independent variable): state+ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionratelt15+ birthratelt15+  abortionratiolt15+ pregnancieslt15+ abortionslt15+ birthslt15+ miscarriageslt15+ populationlt15+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal
+
+
+```{r}
+
+
+# fit the classification tree
+regtree2 <- rpart(pregnancyratelt15 ~ state+ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionratelt15+ birthratelt15+  abortionratiolt15+ pregnancieslt15+ abortionslt15+ birthslt15+ miscarriageslt15+ populationlt15+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal, data = data, method = "anova")
+
+# plot the tree
+plot(regtree2)
+text(regtree2)
+
+fancyRpartPlot(regtree2)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
