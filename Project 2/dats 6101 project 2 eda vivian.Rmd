@@ -1,0 +1,105 @@
+---
+title: "dats 6101 project 2 eda"
+author: "Xue Ming Wang(G20580112)"
+date: "2023-04-16"
+output: html_document
+---
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes some helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# You will need to install it (once) from GitHub.
+# library(devtools)
+# devtools::install_github("physicsland/ezids")
+# Then load the package in your R session.
+library(ezids)
+```
+
+```{r setup, include=FALSE}
+# Some of common RMD options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# Can globally set option for number display format.
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+```
+```{r, results='hide'}
+p2 <- read.csv(file = 'project2_data.csv')
+str(p2)
+```
+For 15-19 age group
+y(Dependent variable):pregnancyrate1519
+x(Independent variable): state, abstinence, abortionban_anomaly, abortionban_sex, substance_poli, year, abortionrate1519, birthrate1519,  abortionratio1519, pregnancies1519, abortions1519, births1519, miscarriages1519, population1519, population1544, abortionstotal, birthstotal, pregnancyratetotal, birthratetotal, abortionratetotal, abortionratiototal, miscarriagestotal, pregnanciestotal
+
+For 15 age group
+y(Dependent variable): pregnancyratelt15 
+x(Independent variable): state, abstinence, abortionban_anomaly, abortionban_sex, substance_poli, year, abortionratelt15, birthratelt15,  abortionratiolt15, pregnancieslt15, abortionslt15, birthslt15, miscarriageslt15, populationlt15, population1544, abortionstotal, birthstotal, pregnancyratetotal, birthratetotal, abortionratetotal, abortionratiototal, miscarriagestotal, pregnanciestotal
+
+```{r}
+p2$abstinence <- factor(p2$abstinence)
+p2$abortionban_anomaly <- factor(p2$abortionban_anomaly)
+p2$abortionban_sex <- factor(p2$abortionban_sex)
+p2$substance_poli <- factor(p2$substance_poli)
+str(p2)
+summary(p2)
+```
+
+
+```{r}
+# Subset the desired columns from p2
+p2new <- p2[, c("pregnancyrate1519", "state", "abstinence", "abortionban_anomaly", "abortionban_sex", "substance_poli", "year", "abortionrate1519", "birthrate1519", "abortionratio1519", "pregnancies1519", "abortions1519", "births1519", "miscarriages1519", "population1519", "population1544", "abortionstotal", "birthstotal", "pregnancyratetotal", "birthratetotal", "abortionratetotal", "abortionratiototal", "miscarriagestotal", "pregnanciestotal")]
+
+# Remove rows with missing values
+p2new <- na.omit(p2new)
+str(p2new)
+```
+
+
+### Distribution of pregnancyratelt15 
+```{r, fig.keep = "none"}
+hist(p2$pregnancyratelt15 )
+boxplot(p2$pregnancyratelt15 )
+qqnorm(p2$pregnancyratelt15 )
+qqline(p2$pregnancyratelt15 )
+```
+
+### Distribution of pregnancyrate1519 
+```{r, fig.keep = "none"}
+hist(p2$ pregnancyrate1519 )
+boxplot(p2$ pregnancyrate1519 )
+qqnorm(p2$ pregnancyrate1519 )
+qqline(p2$ pregnancyrate1519 )
+```
+
+### Distribution of pregnancyrate40plus 
+```{r, fig.keep = "none"}
+hist(p2$pregnancyrate40plus )
+boxplot(p2$pregnancyrate40plus )
+qqnorm(p2$pregnancyrate40plus )
+qqline(p2$pregnancyrate40plus )
+```
+```{r}
+model1 <- lm(pregnancyrate1519 ~ state+ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal, data = p2new)
+summary(model1)
+```
+
+```{r}
+
+stepwise_model <- step(model1, direction = "both")
+
+# Print the summary of the stepwise regression model
+summary(stepwise_model)
+
+```
+abortionrate1519, birthrate1519, pregnancies1519, abortions1519,births1519, pregnancyratetotal, birthratetotal abortionratetotal,
+
+```{r}
+
+forward_model <- step(model1, direction = "forward")
+summary(forward_model)
+```
+
+```{r}
+backward_model <- step(model1, direction = "backward")
+summary(backward_model)
+```
+
+significant variables(not inculding the factorial variables):abortionrate1519, birthrate1519, pregnancies1519, abortions1519,births1519, pregnancyratetotal, birthratetotal abortionratetotal.
