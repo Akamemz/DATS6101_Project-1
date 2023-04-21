@@ -22,7 +22,7 @@ options(scientific=T, digits = 3)
 # options(scipen=9, digits = 3) 
 ```
 ```{r, results='hide'}
-p2 <- read.csv(file = 'project2_data.csv')
+p2 <- read.csv(file = 'data_final.csv')
 str(p2)
 ```
 For 15-19 age group
@@ -51,19 +51,20 @@ summary(p2new)
 
 
 # EDA
+# US pregnancy rate over years
 ```{r}
 library(ggplot2) 
 ggplot(data=p2US, aes(x=year, y=pregnancyrate1519, color = "red")) +
   geom_line()+
-  labs(x = "Year", y = "Number of US Births", title = "US Births by Year", caption = "Figure 1. Trend of US Births 15-19 over time")
+  labs(x = "Year", y = "pregnancy rate", title = "US pregnancy rate by Year", caption = "Figure 1. Trend of US pregnancy rate 15-19 over time")
 ```
 
-
+# US birth rate over years
 ```{r}
 library(ggplot2) 
 ggplot(data=p2US, aes(x=year, y=birthrate1519, color = "red")) +
   geom_line()+
-  labs(x = "Year", y = "Number of US Births", title = "US Births by Year", caption = "Figure 1. Trend of US Births 15-19 over time")
+  labs(x = "Year", y = " US birth rate", title = "US birth rate by Year", caption = "Figure 1. Trend of US birth rate 15-19 over time")
 ```
 
 ### Distribution of pregnancyratelt15 
@@ -112,18 +113,27 @@ boxplot(p2$birthrate40plus)
 qqnorm(p2$birthrate40plus)
 qqline(p2$birthrate40plus)
 ```
+# total pregnancies over years
 ```{r}
 library(ggplot2) 
 ggplot(data=p2US)+
   geom_point(mapping = aes(x=year, y=pregnancies1519, color=state))+
-  labs(title = "Scatterplot of State Birth in TP", caption = "Figure 7. Scatterplot of State Birth")
+  labs(title = "Scatterplot of pregnancies in TP", caption = "Figure 7. Scatterplot of pregnancies")
 ```
 
+# total pregnancy over years in states
 ```{r}
 library(ggplot2) 
 ggplot(data=p2new)+
   geom_point(mapping = aes(x=year, y=pregnancies1519, color=state))+
-  labs(title = "Scatterplot of State Birth in TP", caption = "Figure 7. Scatterplot of State Birth")
+  labs(title = "Scatterplot of pregnancy rate in TP", caption = "Figure 7. Scatterplot of pregnancy rate of each state")
+```
+# pregnancy rate over years in states
+```{r}
+library(ggplot2) 
+ggplot(data=p2new)+
+  geom_point(mapping = aes(x=year, y=pregnancyrate1519, color=state))+
+  labs(title = "Scatterplot of pregnancies in TP", caption = "Figure 7. Scatterplot of pregnancies of each state")
 ```
 ```{r}
 library(maps)
@@ -143,87 +153,95 @@ ggplot() +
 ```
 
 
-
+# pregnancy rate by State Accounting for Abstinence Education
 ```{r}
 library(ggplot2) 
 ggplot(data=p2new)+
-  geom_point(mapping = aes(x=pregnancies1519, y=state, color=abstinence))+
-  labs(title = "State births by State Accounting for Abstinence Education", caption = "Figure 9. State births by State Accounting for Abstinence Education")
+  geom_point(mapping = aes(x=pregnancyrate1519, y=state, color=abstinence))+
+  labs(title = "pregnancy rate by State Accounting for Abstinence Education", caption = "Figure 9. pregnancy rate by State Accounting for Abstinence Education")
 ```
-
+# cover vs uncovered sex-ed
 ```{r, results='hide'}
-cover <- subset(p2new, abstinence==0 | abstinence==1 ) 
+cover <- subset(p2new, abstinence==0) 
 str(cover)
-stress <- subset(p2new, abstinence=="2") 
-str(stress)
+notcover <- subset(p2new, abstinence==1) 
+str(notcover)
 ```
 
+# 15-19
 ```{r}
-t_state_birth = t.test(cover$pregnancies1519, stress$pregnancies1519, conf.level=0.95)
+t_state_birth = t.test(cover$pregnancies1519, notcover$pregnancies1519, conf.level=0.95)
 t_state_birth
 ```
 
-
+# under 15
 ```{r}
-t_state_birth = t.test(cover$pregnancies1519, stress$pregnancyratelt15, conf.level=0.95)
-t_state_birth
-```
-```{r}
-t_state_birth = t.test(cover$pregnancies40plus, stress$pregnancies40plus, conf.level=0.95)
+t_state_birth = t.test(cover$pregnancies1519, notcover$pregnancyratelt15, conf.level=0.95)
 t_state_birth
 ```
 
+# 40+
 ```{r}
-# Subset the desired columns from p2
+t_state_birth = t.test(cover$pregnancies40plus, notcover$pregnancies40plus, conf.level=0.95)
+t_state_birth
+```
+
+# subset variables for 15-19 teens
+```{r}
 p2newdf <- p2new[, c("pregnancyrate1519", "state", "abstinence", "abortionban_anomaly", "abortionban_sex", "substance_poli", "year", "abortionrate1519", "birthrate1519", "abortionratio1519", "pregnancies1519", "abortions1519", "births1519", "miscarriages1519", "population1519", "population1544", "abortionstotal", "birthstotal", "pregnancyratetotal", "birthratetotal", "abortionratetotal", "abortionratiototal", "miscarriagestotal", "pregnanciestotal")]
 ```
 
-
+# full model for 1519 teens
 ```{r}
-model1 <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal, data = p2newdf)
+model1 <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal + state, data = p2newdf)
 summary(model1)
 ```
-full linear model: abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal abortionratetotal,
+full linear model: abortionban_sex1, abortionrate1519, birthrate1519, abortions1519, births1519, population1544, pregnancyratetotal, birthratetotal, stateAR, stateAZ,stateKS, stateKY, stateOK.
 
+
+# stepwise
 ```{r}
 stepwise_model <- step(model1, direction = "both")
 # Print the summary of the stepwise regression model
 summary(stepwise_model)
 ```
-stepwise significant varibles: abortionrate1519, birthrate1519, population1544, pregnancyratetotal, birthratetotal abortionratetotal
+stepwise significant varibles: abortionrate1519, birthrate1519, population1544, pregnancyratetotal, birthratetotal, abortionratetotal
 
+# AIC
 ```{r}
 forward_model <- step(model1, direction = "forward")
 summary(forward_model)
 ```
-AIC significant varibles: abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, abortionratetotal
+AIC significant varibles: abortionban_sex1, abortionrate1519, birthrate1519, abortions1519, births1519, population1544, pregnancyratetotal, birthratetotal, stateAR, stateAZ,stateKS, stateKY, stateOK.
 
-
+# BIC
 ```{r}
 backward_model <- step(model1, direction = "backward")
 summary(backward_model)
 ```
 
-BIC significant variables:abortionrate1519, birthrate1519, population1544, pregnancyratetotal, birthratetotal abortionratetotal.
-
+BIC significant variables:abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal abortionratetotal.
 
 # model 2: significant variables 
 ```{r}
-model2 <- lm(pregnancyrate1519 ~ abortionrate1519+ birthrate1519+ population1544+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf)
+model2 <- lm(pregnancyrate1519 ~ abortionban_sex+ abortionrate1519+ birthrate1519+ abortions1519+ births1519+ population1544+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf)
 summary(model2)
 ```
+significant variables: abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, abortionratetotal 
+
+# Compare model1 to model2 
 ```{r}
 aov12 <- anova(model1, model2)
 aov12
 ```
 model 2 is better 
 
-# model 3: significant variables no population1544
+# model 3: significant variables 
 ```{r}
 model3 <- lm(pregnancyrate1519 ~ abortionrate1519+ birthrate1519+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf)
 summary(model3)
 ```
-
+All varibales significant
 ```{r}
 aov23 <- anova(model2, model3)
 aov23
@@ -231,30 +249,10 @@ aov23
 model 2 is better 
 
 
-
-```{r}
-model4 <- lm(pregnancyrate1519 ~ abortionrate1519*birthrate1519*pregnancyratetotal*birthratetotal*abortionratetotal, data = p2newdf)
-summary(model4)
-```
-birthrate1519 and pregnancyratetotal are significant
-```{r}
-aov24 <- anova(model2, model4)
-aov24
-```
-model 2 is better
-
-```{r}
-model5 <- lm(pregnancyrate1519 ~ birthratetotal+pregnancyratetotal, data = p2newdf)
-
-model6 <- lm(pregnancyrate1519 ~ birthratetotal*pregnancyratetotal, data = p2newdf)
-
-aov56 <- anova(model5, model6)
-aov56
-```
-model 6 is better 
+# correlation matrices
 ```{r, results='markup'}
 library(corrplot)
-signp2newdf <- p2new[, c("pregnancyrate1519", "abortionrate1519", "birthrate1519", "population1544", "pregnancyratetotal", "birthratetotal", "abortionratetotal")]
+signp2newdf <- p2new[, c("pregnancyrate1519", "abortionrate1519", "birthrate1519", "pregnancyratetotal", "birthratetotal", "abortionratetotal")]
 corPearson = cor(signp2newdf)
 corrplot.mixed(corPearson)
 # xkabledply(corPearson, title = "Correlation Matrix for bikeshare df, Pearson (Hour==16 subset, all variables)")
@@ -269,3 +267,17 @@ xkabledply(corDiff, title = "Difference between the Pearson and Spearman methods
 corDiffP = 100*corDiff / (corPearson + corSpearman)
 xkabledply(corDiffP, title = "Percent Difference between the Pearson and Spearman methods")
 ```
+
+# model 4 and 5 comparsion 
+```{r}
+model4 <- lm(pregnancyrate1519 ~ pregnancyratetotal+birthratetotal+abortionratetotal, data = p2newdf)
+summary(model4)
+model5 <- lm(pregnancyrate1519 ~ pregnancyratetotal*birthratetotal*abortionratetotal, data = p2newdf)
+summary(model5)
+```
+
+```{r}
+aov45 <- anova(model4, model5)
+aov45
+```
+model 5 is better
