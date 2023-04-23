@@ -489,4 +489,8 @@ summary(modeltotal)
 
 modeltotal_state<-lm(pregnancyratetotal~birthratetotal +pregnanciestotal + abortionstotal + birthstotal+state, data = p2newdf1519)
 summary(modeltotal_state)
+
+model_birthrate_state<-lm(pregnancyratetotal~birthratetotal + state, data = p2newdf1519)
+
+summary(model_birthrate_state)
 ```
