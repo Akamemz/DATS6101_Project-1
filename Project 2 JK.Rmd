@@ -1,0 +1,40 @@
+---
+title: "Project 2"
+author: "Jonathan Kratchman"
+date: "`rSysDate()"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+df_orig<-read_csv("/Users/jonathan/Documents/GitHub/DATS6101_Project-1/Tables/project2_data.csv")
+str(df_orig)
+df_orig$state<-as.factor(df_orig$state)
+df_orig$year<-as.factor(df_orig$year)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r}
+par(mfrow = c(2, 2))
+hist(x=df_orig$birthstotal)
+```
+
+```{r}
+model1<-lm(pregnancies1519~ state+abstinence+pregnancyrate1519, data=df_orig)
+summary(model1)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
