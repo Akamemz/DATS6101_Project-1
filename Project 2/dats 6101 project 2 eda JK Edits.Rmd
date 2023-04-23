@@ -483,6 +483,10 @@ model40plus35
 model40plus3 is better
 
 ```{r}
-modeltotal<-lm(pregnancyratetotal~birthratetotal +pregnanciestotal + abortionstotal + birthstotal, data = p2new)
+str(p2new)
+modeltotal<-lm(pregnancyratetotal~birthratetotal +pregnanciestotal + abortionstotal + birthstotal, data = p2newdf1519)
 summary(modeltotal)
+
+modeltotal_state<-lm(pregnancyratetotal~birthratetotal +pregnanciestotal + abortionstotal + birthstotal+state, data = p2newdf1519)
+summary(modeltotal_state)
 ```
