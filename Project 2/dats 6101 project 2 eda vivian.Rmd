@@ -168,32 +168,66 @@ notcover <- subset(p2new, abstinence==1)
 str(notcover)
 ```
 
-# 15-19
+# 15-19 sex edu
 ```{r}
-t_state_birth = t.test(cover$pregnancies1519, notcover$pregnancies1519, conf.level=0.95)
-t_state_birth
+sexedu1519 = t.test(cover$pregnancyrate1519, notcover$pregnancies1519, conf.level=0.95)
+sexedu1519
 ```
 
-# under 15
+# under 15 sex edu
 ```{r}
-t_state_birth = t.test(cover$pregnancies1519, notcover$pregnancyratelt15, conf.level=0.95)
-t_state_birth
+sexedult15= t.test(cover$pregnancyratelt15, notcover$pregnancyratelt15, conf.level=0.95)
+sexedult15
 ```
 
-# 40+
+# 40+ sex edu
 ```{r}
-t_state_birth = t.test(cover$pregnancies40plus, notcover$pregnancies40plus, conf.level=0.95)
-t_state_birth
+sexedu40 = t.test(cover$pregnancyrate40plus, notcover$pregnancyrate40plus, conf.level=0.95)
+sexedu40 
+```
+
+# 15-19 vs 15 under
+```{r}
+age1519vslt15= t.test(cover$pregnancies40plus, notcover$pregnancies40plus, conf.level=0.95)
+age1519vslt15
 ```
 
 # subset variables for 15-19 teens
 ```{r}
-p2newdf <- p2new[, c("pregnancyrate1519", "state", "abstinence", "abortionban_anomaly", "abortionban_sex", "substance_poli", "year", "abortionrate1519", "birthrate1519", "abortionratio1519", "pregnancies1519", "abortions1519", "births1519", "miscarriages1519", "population1519", "population1544", "abortionstotal", "birthstotal", "pregnancyratetotal", "birthratetotal", "abortionratetotal", "abortionratiototal", "miscarriagestotal", "pregnanciestotal")]
+p2newdf1519 <- p2new[, c("pregnancyrate1519", "state", "abstinence", "abortionban_anomaly", "abortionban_sex", "substance_poli", "year", "abortionrate1519", "birthrate1519", "abortionratio1519", "pregnancies1519", "abortions1519", "births1519", "miscarriages1519", "population1519", "population1544", "abortionstotal", "birthstotal", "pregnancyratetotal", "birthratetotal", "abortionratetotal", "abortionratiototal", "miscarriagestotal", "pregnanciestotal")]
+```
+
+# subset variables for 15 under
+```{r}
+p2newunder15<- p2new[, c("pregnancyratelt15", "state", "abstinence", "abortionban_anomaly", "abortionban_sex", "substance_poli", "year", "abortionratelt15", "birthratelt15", "abortionratiolt15", "pregnancieslt15", "abortionslt15", "birthslt15", "miscarriageslt15", "populationlt15", "population1544", "abortionstotal", "birthstotal", "pregnancyratetotal", "birthratetotal", "abortionratetotal", "abortionratiototal", "miscarriagestotal", "pregnanciestotal")]
+```
+
+# subset variables for 40+
+```{r}
+p2new40plus<- p2new[, c("pregnancyrate40plus", "state", "abstinence", "abortionban_anomaly", "abortionban_sex", "substance_poli", "year", "abortionrate40plus", "birthrate40plus", "abortionratio40plus", "pregnancies40plus", "abortions40plus", "births40plus", "miscarriages40plus", "population40plus", "population1544", "abortionstotal", "birthstotal", "pregnancyratetotal", "birthratetotal", "abortionratetotal", "abortionratiototal", "miscarriagestotal", "pregnanciestotal")]
+```
+
+# 15-19 vs 15 under
+```{r}
+age1519vslt15= t.test(p2newdf1519$pregnancyrate1519, p2newunder15$pregnancyratelt15, conf.level=0.95)
+age1519vslt15
+```
+
+# 15-19 vs 40 plus
+```{r}
+age1519vslt15= t.test(p2newdf1519$pregnancyrate1519, p2new40plus$pregnancyrate40plus, conf.level=0.95)
+age1519vslt15
+```
+
+# 40 plus vs 15 under
+```{r}
+age1519vslt15= t.test(p2new40plus$pregnancyrate40plus, p2newunder15$pregnancyratelt15, conf.level=0.95)
+age1519vslt15
 ```
 
 # full model for 1519 teens
 ```{r}
-model1 <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal + state, data = p2newdf)
+model1 <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal + state, data = p2newdf1519)
 summary(model1)
 ```
 full linear model: abortionban_sex1, abortionrate1519, birthrate1519, abortions1519, births1519, population1544, pregnancyratetotal, birthratetotal, stateAR, stateAZ,stateKS, stateKY, stateOK.
@@ -224,7 +258,7 @@ BIC significant variables:abortionrate1519, birthrate1519, pregnancyratetotal, b
 
 # model 2: significant variables 
 ```{r}
-model2 <- lm(pregnancyrate1519 ~ abortionban_sex+ abortionrate1519+ birthrate1519+ abortions1519+ births1519+ population1544+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf)
+model2 <- lm(pregnancyrate1519 ~ abortionban_sex+ abortionrate1519+ birthrate1519+ abortions1519+ births1519+ population1544+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf1519)
 summary(model2)
 ```
 significant variables: abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, abortionratetotal 
@@ -238,7 +272,7 @@ model 2 is better
 
 # model 3: significant variables 
 ```{r}
-model3 <- lm(pregnancyrate1519 ~ abortionrate1519+ birthrate1519+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf)
+model3 <- lm(pregnancyrate1519 ~ abortionrate1519+ birthrate1519+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf1519)
 summary(model3)
 ```
 All varibales significant
@@ -247,17 +281,17 @@ aov23 <- anova(model2, model3)
 aov23
 ```
 model 2 is better 
-
-
+    
 # correlation matrices
 ```{r, results='markup'}
 library(corrplot)
-signp2newdf <- p2new[, c("pregnancyrate1519", "abortionrate1519", "birthrate1519", "pregnancyratetotal", "birthratetotal", "abortionratetotal")]
-corPearson = cor(signp2newdf)
+signp2newdf1519 <- p2new[, c("pregnancyrate1519", "abortionrate1519", "birthrate1519", "abortions1519", "births1519", "population1544", "pregnancyratetotal")]
+signp2newdf1519<-na.omit(signp2newdf1519)
+corPearson = cor(signp2newdf1519)
 corrplot.mixed(corPearson)
 # xkabledply(corPearson, title = "Correlation Matrix for bikeshare df, Pearson (Hour==16 subset, all variables)")
 
-corSpearman = cor(signp2newdf, method = "spearman")
+corSpearman = cor(signp2newdf1519, method = "spearman")
 corrplot.mixed(corSpearman)
 # xkabledply(corSpearman, title = "Correlation Matrix for bikeshare df, Spearman (Hour==16 subset, all variables)")
 ```
@@ -270,14 +304,180 @@ xkabledply(corDiffP, title = "Percent Difference between the Pearson and Spearma
 
 # model 4 and 5 comparsion 
 ```{r}
-model4 <- lm(pregnancyrate1519 ~ pregnancyratetotal+birthratetotal+abortionratetotal, data = p2newdf)
-summary(model4)
-model5 <- lm(pregnancyrate1519 ~ pregnancyratetotal*birthratetotal*abortionratetotal, data = p2newdf)
-summary(model5)
-```
-
-```{r}
+model4 <- lm(pregnancyrate1519 ~ birthrate1519+abortionrate1519, data = p2newdf1519)
+model5 <- lm(pregnancyrate1519 ~ birthrate1519+abortionrate1519+pregnancyratetotal, data = p2newdf1519)
 aov45 <- anova(model4, model5)
 aov45
 ```
-model 5 is better
+model 4 is better
+# model 4 and 5 comparsion 
+```{r}
+model6 <- lm(pregnancyrate1519 ~ birthrate1519*abortionrate1519, data = p2newdf1519)
+aov46 <- anova(model4, model6)
+aov46
+```
+model 4 is better
+
+## full model for under 15 year old 
+```{r}
+p2newunder15<-na.omit(p2newunder15)
+model15under1 <- lm(pregnancyratelt15 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionratelt15+ birthratelt15+  abortionratiolt15+ pregnancieslt15+ abortionslt15+ birthslt15+ miscarriageslt15+ populationlt15+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal+ state, data = p2newunder15)
+summary(model15under1)
+```
+full linear model significant variables: abortionratelt15, birthratelt15,  stateNE.
+# stepwise
+```{r}
+stepwise_model <- step(model15under1, direction = "both")
+# Print the summary of the stepwise regression model
+summary(stepwise_model)
+```
+stepwise significant varibles: abortionratelt15, birthratelt15, abortionratiolt15, substance_poli1, 
+
+# AIC
+```{r}
+forward_model <- step(model15under1, direction = "forward")
+summary(forward_model)
+```
+AIC significant varibles:  abortionratelt15, birthratelt15,  stateNE.
+
+# BIC
+```{r}
+backward_model <- step(model15under1, direction = "backward")
+summary(backward_model)
+```
+
+BIC significant variables: abortionratelt15, birthratelt15, abortionratiolt15
+
+# model 2: significant variables 
+```{r}
+model15under2 <- lm(pregnancyratelt15 ~ abortionratelt15+ birthratelt15+ abortionratiolt15+ substance_poli, data = p2newunder15)
+summary(model15under2)
+```
+significant variables: all significant
+
+# Compare model1 to model2 
+```{r}
+model15under12 <- anova(model15under1, model15under2)
+model15under12
+```
+model 2 is better 
+
+# correlation matrices
+```{r, results='markup'}
+library(corrplot)
+signp2newunder15 <- p2newunder15[, c("pregnancyratelt15", "abortionratelt15", "birthratelt15", "abortionratiolt15", "substance_poli")]
+signp2newunder15$substance_poli<- as.numeric(signp2newunder15$substance_poli)
+signp2newunder15<-na.omit(signp2newunder15)
+corPearson = cor(signp2newunder15)
+corrplot.mixed(corPearson)
+# xkabledply(corPearson, title = "Correlation Matrix for bikeshare df, Pearson (Hour==16 subset, all variables)")
+
+corSpearman = cor(signp2newunder15, method = "spearman")
+corrplot.mixed(corSpearman)
+# xkabledply(corSpearman, title = "Correlation Matrix for bikeshare df, Spearman (Hour==16 subset, all variables)")
+```
+```{r, results="markup"}
+corDiff = corPearson - corSpearman
+xkabledply(corDiff, title = "Difference between the Pearson and Spearman methods")
+corDiffP = 100*corDiff / (corPearson + corSpearman)
+xkabledply(corDiffP, title = "Percent Difference between the Pearson and Spearman methods")
+```
+
+# model 4 and 5 comparsion 
+```{r}
+model15under3 <- lm(pregnancyratelt15 ~ abortionratelt15+ birthratelt15, data = p2newunder15)
+model15under4 <- lm(pregnancyratelt15 ~ abortionratelt15, data = p2newunder15)
+model15under34 <- anova(model15under3, model15under4)
+model15under34
+```
+model15under3 is better
+
+# model 4 and 5 comparsion 
+```{r}
+model15under5 <- lm(pregnancyratelt15 ~ abortionratelt15* birthratelt15, data = p2newunder15)
+model15under35 <- anova(model15under3, model15under5)
+model15under35
+```
+model15under3 is better
+
+# full model for 40 plus years old
+```{r}
+# p2new40plus<-na.omit(p2new40plus)
+model40plus1 <- lm(pregnancyrate40plus ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ year+ abortionrate40plus+ birthrate40plus+  abortionratio40plus+ pregnancies40plus+ abortions40plus+ births40plus+ miscarriages40plus+ population40plus+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal+ state, data = p2new40plus)
+summary(model40plus1)
+```
+full linear model significant variables: abortionrate40plus, birthrate40plus,  pregnancies40plus, abortions40plus, births40plus
+
+# stepwise
+```{r}
+stepwise_model <- step(model40plus1 , direction = "both")
+# Print the summary of the stepwise regression model
+summary(stepwise_model)
+```
+stepwise significant varibles: abortionrate40plus, birthrate40plus, pregnancies40plus, abortions40plus, births40plus, abstinence1
+
+# AIC
+```{r}
+forward_model <- step(model40plus1, direction = "forward")
+summary(forward_model)
+```
+AIC significant varibles:  abortionrate40plus, birthrate40plus,  pregnancies40plus, abortions40plus, births40plus
+
+# BIC
+```{r}
+backward_model <- step(model40plus1, direction = "backward")
+summary(backward_model)
+```
+
+BIC significant variables: abortionrate40plus, birthrate40plus,  pregnancies40plus, abortions40plus, births40plus
+
+# model 2: significant variables 
+```{r}
+model40plus2 <- lm(pregnancyrate40plus ~abortionrate40plus+birthrate40plus+pregnancies40plus+abortions40plus+births40plus, data = p2new40plus)
+summary(model40plus2)
+```
+significant variables: all significant
+
+# Compare model1 to model2 
+```{r}
+model40plus12 <- anova(model40plus1, model40plus2 )
+model40plus12
+```
+model40plus12 is better 
+
+# correlation matrices
+```{r, results='markup'}
+library(corrplot)
+signp2new40plus <- p2new40plus[, c("pregnancyrate40plus", "abortionrate40plus", "birthrate40plus", "pregnancies40plus", "abortions40plus", "births40plus")]
+signp2new40plus <-na.omit(signp2new40plus )
+corPearson = cor(signp2new40plus)
+corrplot.mixed(corPearson)
+# xkabledply(corPearson, title = "Correlation Matrix for bikeshare df, Pearson (Hour==16 subset, all variables)")
+
+corSpearman = cor(signp2new40plus, method = "spearman")
+corrplot.mixed(corSpearman)
+# xkabledply(corSpearman, title = "Correlation Matrix for bikeshare df, Spearman (Hour==16 subset, all variables)")
+```
+```{r, results="markup"}
+corDiff = corPearson - corSpearman
+xkabledply(corDiff, title = "Difference between the Pearson and Spearman methods")
+corDiffP = 100*corDiff / (corPearson + corSpearman)
+xkabledply(corDiffP, title = "Percent Difference between the Pearson and Spearman methods")
+```
+
+# model 4 and 5 comparsion 
+```{r}
+model40plus3 <- lm(pregnancyrate40plus ~ abortionrate40plus+ birthrate40plus, data = p2new40plus)
+model40plus4 <- lm(pregnancyrate40plus ~ abortionrate40plus, data = p2new40plus)
+model40plus34 <- anova(model40plus3, model40plus4)
+model40plus34
+```
+model40plus3 is better
+
+# model 4 and 5 comparsion 
+```{r}
+model40plus5 <- lm(pregnancyrate40plus ~ abortionrate40plus*birthrate40plus, data = p2new40plus)
+model40plus35 <- anova(model40plus3, model40plus5)
+model40plus35
+```
+model40plus3 is better
