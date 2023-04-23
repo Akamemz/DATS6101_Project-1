@@ -481,3 +481,8 @@ model40plus35 <- anova(model40plus3, model40plus5)
 model40plus35
 ```
 model40plus3 is better
+
+```{r}
+modeltotal<-lm(pregnancyratetotal~birthratetotal +pregnanciestotal + abortionstotal + birthstotal, data = p2new)
+summary(modeltotal)
+```
