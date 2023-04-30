@@ -1,0 +1,467 @@
+---
+title: "Dats 6101 project 2 write up df"
+author: "group 1"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    number_sections: false
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+# Project 2 Write-Up
+```{r init, include=F}
+# The package "ezids" (EZ Intro to Data Science) includes some helper functions we developed for the course. 
+# Some of the frequently used functions are loadPkg(), xkabledply(), xkablesummary(), uzscale(), etc.
+# You will need to install it (once) from GitHub.
+# library(devtools)
+# devtools::install_github("physicsland/ezids")
+# Then load the package in your R session.
+library(ezids)
+```
+
+```{r setup, include=FALSE}
+# Some of common RMD options (and the defaults) are: 
+# include=T, eval=T, echo=T, results='hide'/'asis'/'markup',..., collapse=F, warning=T, message=T, error=T, cache=T, fig.width=6, fig.height=4, fig.dim=c(6,4) #inches, fig.align='left'/'center','right', 
+# Can globally set option for number display format.
+options(scientific=T, digits = 3) 
+# options(scipen=9, digits = 3) 
+library(dplyr)
+```
+```{r, results='hide'}
+p2 <- read.csv(file = 'data_final.csv')
+str(p2)
+```
+
+# Data Set Description 
+
+Variable |  Definition  
+  :-:    |  :-- 
+state | 51 state or district in USA
+abstinence	| Indicator for abstinence-only sex education policies
+abortionban_anomaly	| Indicator for anomalous abortion bans
+abortionban_sex	| Indicator for abortion bans based on sex selection
+substance_poli	| Indicator for substance abuse prevention policies
+year |  The year of the data collection: 1988 to 2013
+pregnancyratelt15	| Pregnancy rate for women under 15 years of age
+pregnancyrate1519 |	Pregnancy rate for women aged 15-19
+pregnancyrate40plus	| Pregnancy rate for women over 40 years of age
+abortionratelt15 |	Abortion rate for women under 15 years of age
+abortionrate1519 | 	Abortion rate for women aged 15-19
+abortionrate40plus	| Abortion rate for women over 40 years of age
+birthratelt15	| Birth rate for women under 15 years of age
+birthrate1519 |	Birth rate for women aged 15-19
+birthrate40plus	| Birth rate for women over 40 years of age
+abortionratiolt15	| Abortion ratio for women under 15 years of age
+abortionratio1519	| Abortion ratio for women aged 15-19
+abortionratio40plus	| Abortion ratio for women over 40 years of age
+pregnancieslt15	| Number of pregnancies for women under 15 years of age
+pregnancies1519 | 	Number of pregnancies for women aged 15-19
+pregnancies40plus	| Number of pregnancies for women over 40 years of age
+abortionslt15	| Number of abortions for women under 15 years of age
+abortions1519	| Number of abortions for women aged 15-19
+abortions40plus	| Number of abortions for women over 40 years of age
+birthslt15 |	Number of live births for women under 15 years of age
+births1519 |	Number of live births for women aged 15-19
+births40plus	| Number of live births for women over 40 years of age
+miscarriageslt15	| Number of miscarriages for women under 15 years of age
+miscarriages1519	| Number of miscarriages for women aged 15-19
+miscarriages40plus |	Number of miscarriages for women over 40 years of age
+populationlt15 |	Total population under 15 years of age
+population1519 | Total population aged 15-19
+population40plus |	Total population over 40 years of age
+abortionstotal | Total number of abortions
+birthstotal	| Total number of births
+pregnancyratetotal | Total pregnancy rate
+birthratetotal |	Total birth rate
+abortionratetotal	| Total abortion rate
+abortionratiototal |	Total abortion ratio
+miscarriagestotal |	Total number of miscarriages
+pregnanciestotal |	Total number of pregnancies
+
+## Cleaning Dataset
+First, we split the data into two dataset: one including data for all states, and another one containing data for the United States as a whole.
+```{r, results='hide'}
+# subset US and other states
+p2new <- subset(p2, state != "US")
+str(p2new)
+p2US <- subset(p2, state=="US") 
+str(p2US)
+```
+Secondly, we convert the variables abstinence, abortionban_anomaly, abortionban_sex, and substance_poli into factor variables.
+```{r}
+# Factor Conversions
+p2new$abstinence=as.factor(p2new$abstinence)
+p2new$abortionban_anomaly =as.factor(p2new$abortionban_anomaly)
+p2new$abortionban_sex=as.factor(p2new$abortionban_sex)
+p2new$substance_poli=as.factor(p2new$substance_poli)
+str(p2new)
+```
+Lastly, we group the states into six regions:
+
+New England:	Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, Vermont
+
+Middle Atlantic:	Delaware, Maryland, District of Washington, New Jersey, New York, Pennsylvania
+
+South:	Alabama, Arkansas, Florida, Georgia, Kentucky, Louisiana, Mississippi, Missouri, North Carolina, South Carolina, Tennessee, Virginia, West Virginia
+
+Midwest:	Illinois, Indiana, Iowa, Kansas, Michigan, Minnesota, Nebraska, North Dakota, Ohio, South Dakota, Wisconsin
+
+Southwest:	Arizona, New Mexico, Oklahoma, Texas
+
+West:	Alaska, California, Colorado, Hawaii, Idaho, Montana, Nevada, Oregon, Utah, Washington, Wyoming
+
+```{r}
+new_england <- c("CT", "ME", "MA", "NH", "RI", "VT")
+middle_atlantic <- c("DE", "MD", "NJ", "NY", "PA","DC")
+south <- c("AL", "AR", "FL", "GA", "KY", "LA", "MS", "MO", "NC", "SC", "TN", "VA", "WV")
+midwest <- c("IL", "IN", "IA", "KS", "MI", "MN", "NE", "ND", "OH", "SD", "WI")
+southwest <- c("AZ", "NM", "OK", "TX")
+west <- c("AK", "CA", "CO", "HI", "ID", "MT", "NV", "OR", "UT", "WA", "WY")
+
+new_england <- subset(p2,  state %in% new_england)
+middle_atlantic <- subset(p2,  state %in% middle_atlantic)
+south <- subset(p2,  state %in% south)
+midwest <- subset(p2,  state %in% midwest)
+southwest <- subset(p2,  state %in% southwest)
+west <- subset(p2,  state %in% west)
+
+
+p2new$region <- ifelse(p2new$state %in% c("CT", "ME", "MA", "NH", "RI", "VT"), "new_england",
+               ifelse(p2new$state %in% c("DE", "MD", "NJ", "NY", "PA","DC"), "middle_atlantic",
+               ifelse(p2new$state %in% c("AL", "AR", "FL", "GA", "KY", "LA", "MS", "MO", "NC", "SC", "TN", "VA", "WV"), "south",
+               ifelse(p2new$state %in% c("IL", "IN", "IA", "KS", "MI", "MN", "NE", "ND", "OH", "SD", "WI"), "midwest",
+               ifelse(p2new$state %in% c("AZ", "NM", "OK", "TX"), "southwest",
+               ifelse(p2new$state %in% c("AK", "CA", "CO", "HI", "ID", "MT", "NV", "OR", "UT", "WA", "WY"), "west",
+               "other"))))))
+```
+
+Subset Variables for 15-19 Teens
+```{r}
+p2newdf1519 <- p2new[, c("pregnancyrate1519", "state","region", "abstinence", "abortionban_anomaly", "abortionban_sex", "substance_poli", "year", "abortionrate1519", "birthrate1519", "abortionratio1519", "pregnancies1519", "abortions1519", "births1519", "miscarriages1519", "population1519", "population1544", "abortionstotal", "birthstotal", "pregnancyratetotal", "birthratetotal", "abortionratetotal", "abortionratiototal", "miscarriagestotal", "pregnanciestotal")]
+```
+# EDA
+
+## Summary Statistics
+```{r}
+summary(p2new)
+```
+Table 1: Summary Statistics
+The table here represents an overview of all variables for teens 15 to 19 years old.
+
+First, we want an overview of US pregnancy rate for US 15-19 year old teens 
+## US Pregnancy Rate Over Years
+```{r}
+library(ggplot2) 
+ggplot(data=p2US, aes(x=year, y=pregnancyrate1519, color = "red")) +
+  geom_line()+
+  labs(x = "Year", y = "pregnancy rate", title = "US Pregnancy Rate by Year", caption = "Figure 1. Trend of US Pregnancy Rate 15-19 Over Time")
+```
+Figure 1 shows that the US pregnancy rate has been declining since the 1990s. Prior to the 1990s, the pregnancy rate in the US was increasing. The number of births in the US peaked in 1990 and reached its lowest point in 2017. The trend indicates that the number of US births was generally decreasing from 1990 to 2017.
+
+## Normality Tests
+We have conducted normality tests on the distribution of our response variable, pregnancyrate1519 and have identified that it can be considered normally distributed.
+
+### Distribution of Pregnancyrate1519 
+```{r}
+hist(p2new$ pregnancyrate1519, main="Figure 2. Histogram of Pregnancyrate1519")
+boxplot(p2new$ pregnancyrate1519 , main="Figure 3. Boxplot of Pregnancyrate1519")
+qqnorm(p2new$ pregnancyrate1519 , main="Figure 4. QQ-plot of Pregnancyrate1519")
+qqline(p2new$ pregnancyrate1519)
+```
+The response variable is the pregnancy rate for teenagers aged 15 to 19. The histogram (figure 2) and boxplot (figure 3) indicate that it is slightly right-skewed, likely due to the presence of outliers. However, the QQ-plot (figure 4) closely follows the normal line, suggesting that the distribution is still considered to be normal.
+
+Removing all the outliers can be an option to deal with outliers. On the other hand, it is important to carefully consider the reason for the outliers before removing them, as this could impact the validity of the results.
+
+#### Pregnancy Rate Outliers
+```{r, results='hide', fig.keep = 'none'}
+newpregnancyrate1519= outlierKD2(p2new, pregnancyrate1519, rm=TRUE, boxplt=TRUE, histogram=TRUE, qqplt=TRUE)
+outPR = subset(newpregnancyrate1519, is.na(pregnancyrate1519)) 
+xkabledplyhead(outPR, title = " Table 2. Outliers for Pregnancy Rate")
+``` 
+
+
+```{r}
+library(maps)
+library(ggplot2)
+
+us_map <- map_data("state")
+
+highlight_states <- c("california", "arizona", "district of columbia")
+
+ggplot() +
+  geom_polygon(data = us_map, aes(x = long, y = lat, group = group, fill = ifelse(region %in% highlight_states, region, "Other")),
+               color = "black") +
+  theme_void() +
+  coord_map() +
+  scale_fill_manual(values = c("california" = "red", "arizona" = "blue", "district of columbia" = "green", "Other" = "white"), name = "Labels") +
+  labs(title = "Outlier States for Pregnancy Rate", caption = "Figure 5. Outlier States for Pregnancy Rate") +
+  geom_point(data = us_map[us_map$region == "district of columbia", ], aes(x = long, y = lat), color = "green", size = 3, shape = 1)
+
+```
+During our examination of pregnancy rate outliers, it became evident that the majority of these outliers occur in three particular states: California, Arizona, and District of Columbia (Figure 5). In comparison to other states, these three states exhibit substantially higher rates of teen pregnancy. 
+
+#### Pregnancy Rates Total - Important Observations by Select States
+```{r}
+model_birthrate_state<-lm(pregnancyratetotal~birthratetotal + state, data = p2newdf1519)
+summary(model_birthrate_state)
+```
+After identifying California, Arizona, and District of Columbia as outliers due to their extreme values, we used them as regressors in a linear regression to determine their contribution to pregnancy rates total in selected states. The coefficient here represents the expected change in the pregnancy rate for the three states when compared to the average pregnancy rate total for all states. Since these coefficients have a positive value and are statistically significant (as indicated by the low p-value), it suggests that the three states has a higher number of pregnancies compared to all states. These findings can be used to inform policy decisions and programs aimed at reducing unwanted pregnancies in the states under review.
+
+#### Pregnancies Over Years in States
+```{r}
+library(ggplot2) 
+ggplot(data=p2new)+
+  geom_point(mapping = aes(x=year, y=pregnancies1519, color=state))+
+  labs(title = "Scatterplot of Pregnancies in TP", caption = "Figure 6. Scatterplot of Pregnancies of Each State")
+```
+Based on Figure 6, it is evident that California, Arizona, and District of Columbia (the outlier states) have a higher number of births compared to other states. However, they still exhibit a trend similar to that of other states, which is a decreasing trend in the number of teen pregnancies over the years. Therefore, it can be concluded that, in general, the trend for each state is decreasing over time. Therefore, it is not necessary to remove the outliers and the pregnancy rate can be treated as following a normal distribution.
+
+## Abstinence Scales
+Next, we will analyze the correlation between the abstinence rates of each state and their respective pregnancy rates.
+
+### Pregnancy Rate by State Accounting for Abstinence Education
+```{r}
+library(ggplot2) 
+ggplot(data=p2new)+
+  geom_point(mapping = aes(x=pregnancyrate1519, y=state, color=abstinence))+
+  labs(title = "Pregnancy Rate by State Accounting for Abstinence Education", caption = "Figure 7. Pregnancy Rate by State Accounting for Abstinence Education")
+```
+Figure 7 shows a scatter plot of the state pregnancies of each state plotted against their corresponding abstinence scales, where a score of 0 represents the absence of any abstinence laws and a score of 1 indicates the presence of certain scales of law for abstinence. However, no clear patterns were observed in the plot, suggesting the need for further analysis of the effectiveness of sex education for teenagers.
+
+### Comparing Cover Sex Education and Not Cover Sex Education
+We will take the necessary steps to test for any disparities between the group that received covered sex education and the group that did not receive covered sex education.
+```{r, results='hide'}
+cover <- subset(p2new, abstinence==0) 
+str(cover)
+notcover <- subset(p2new, abstinence==1) 
+str(notcover)
+```
+
+```{r}
+sexedu1519 = t.test(cover$pregnancyrate1519, notcover$pregnancies1519, conf.level=0.95)
+sexedu1519
+```
+We conducted t-tests to compare the pregnancy rates of the 15 to 19 age group between the group that received sex education and the group that did not receive sex education at a 95% confidence level. The p-value is less than the significance level of 0.05 indicating that the difference between the two groups is statistically significant, and we reject the null hypothesis that there is no difference. The results here suggest that there is a statistically significant difference in pregnancy rates between the two groups, indicating that sex education has an impact on reducing pregnancy rates among teenagers. To further investigate the decrease in teen pregnancy rates, we will employ various models to determine whether factors such as abstinence education had an impact on the observed trend.
+
+# Data Analysis
+## Full Linear Regression Model
+```{r}
+model1 <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal, data = p2newdf1519)
+summary(model1)
+```
+First, a linear regression model was performed on the 15-19 age group, which included all available factors except for year and states. This model is referred to as the full model. The coefficients column in the results table shows the estimated effect of each predictor variable on the response variable, while holding all other predictors constant. For example, the coefficient for abortion rate among 15-19 year-olds is 1.1, indicating that for every one unit increase in the abortion rate per 1,000 females aged 15-19, the teen pregnancy rate is estimated to increase by 1.10 units, assuming all other variables remain constant. Similarly, the coefficient for birth rate in the linear regression model is 1.2, which means that for every one unit increase in the birth rate, the teen pregnancy rate is estimated to increase by 1.20 units, while all other factors are held constant.
+
+Our analysis indicates that the abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total are significant variables that impact the teen pregnancy rate, as their p-values are less than 0.05. A p-value less than 0.05 indicates that there is evidence to reject the null hypothesis and that the corresponding variable has a statistically significant relationship with the teen pregnancy rate. Therefore, we can conclude that there is evidence to suggest that the abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total have a statistically significant relationship with the teen pregnancy rate in the population.
+
+### Controlled Variables
+#### Controlled by State 
+```{r}
+model_state <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal + state, data = p2newdf1519)
+summary(model_state)
+
+```
+Based on the linear regression model with controlled state for 15 to 19 year old teens, the coefficient for state represents the change in pregnancy rate for a one-unit increase in the "state" variable. For example, the estimated coefficient for the state Arizona (AZ) is 0.132, which means that a one-unit increase in Arizona is associated with a 0.132 increase in pregnancy rate.
+
+The analysis also shows that there are several significant variables that impact the teen pregnancy rate, including abortionban_sex1, abortionrate1519, birthrate1519, abortions1519, births1519, population1544, pregnancyratetotal, birthratetotal, stateAR, stateAZ, stateKS, stateKY, and stateOK. These variables have p-values less than 0.05, indicating that there is evidence to suggest that they have a statistically significant relationship with the teen pregnancy rate in the population when controlling for the state variable. Therefore, it can be concluded that these variables play an important role in predicting the teen pregnancy rate. It is important to note that the model has singularities since there are four NAs.
+
+#### Controlled by Region
+```{r}
+model_region <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal + region, data = p2newdf1519)
+summary(model_region)
+```
+
+In this model, the US states are categorized into six regions: Midwest, Middle Atlantic, New England, South, SouthWest, and West. Each region has a corresponding coefficient estimate, which represents the expected difference in the pregnancy rate compared to the reference region, which is Middle Atlantic. For instance, the coefficient estimate for the Midwest is 0.0189, which means that, on average, the pregnancy rate in the Midwest region is expected to be 0.0189 units higher than the Middle Atlantic. However, the associated p-values for these coefficients are relatively high, indicating that there is not strong evidence to suggest any of these regions have significantly different pregnancy rates than the reference region after controlling for the other variables in the model.
+
+As in the full model, our analysis confirms that the same five variables, abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total, significantly affect the teen pregnancy rate, as their p-values are less than 0.05. Thus, we can conclude that there is evidence to suggest that these five variables have a statistically significant relationship with the teen pregnancy rate in the population.
+
+#### Controlled by Year 
+```{r}
+p2newdf1519$year=as.factor(p2newdf1519$year)
+model_year <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal+ year, data = p2newdf1519)
+summary(model_year)
+```
+This model estimates the coefficients for different years, indicating the average change in pregnancy rate among 15-19-year-olds per year compared to 1988. A coefficient estimate of 0.0184 for 2011, for example, means that the pregnancy rate increased by an average of 0.0184 percentage points per year compared to 1988. Conversely, a negative coefficient estimate for a particular year would indicate a decrease in the pregnancy rate compared to 1990. However, the high p-values associated with these coefficients suggest that there is no strong evidence to support any significant differences in pregnancy rates compared to 1998, after controlling for other variables in the model.
+
+Our analysis indicates that six variables have a statistically significant relationship with the teen pregnancy rate in the population, as their p-values are less than 0.05. These variables are abortionban_sex1, abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total. Therefore, we can conclude that there is evidence to suggest that these variables play a significant role in determining the teen pregnancy rate under control of years.
+
+### Comparing Models
+We will use anova test to compare full model, model that controlls state, region, and year to find out the best model
+```{r}
+anova(model1, model_state, model_region, model_year)
+```
+The objective of the analysis is to identify the set of independent variables that best explain the variation in pregnancy rates among 15-19 year-olds. The ANOVA table at the bottom shows the results of the model comparisons. Model 2 and Model 3 both provide a significantly better fit to the data compared to Model 1. The p-value of Model 3 is less than 0.05, indicating that the null hypothesis (that the new variables have no effect on the model's fit) can be rejected at a 5% significance level. Therefore, region significantly improves the model's fit compared to Model 1. Model 4 does not significantly improve the fit of the model compared to Model 1, as indicated by the non-significant F statistic and p-value (p > 0.05). In summary, the results suggest that Model 3, which is controlled by region, may provide the best fit to the data. Therefore, further analysis would focus on Model 3 to gain more insights.
+
+## Feature/Variable Selection
+### Stepwise
+```{r}
+stepwise_model <- step(model_region, direction = "both")
+summary(stepwise_model)
+```
+Using stepwise variable selection, the significant variables, based on the p-values, are abortionrate1519, birthrate1519, population1544, pregnancyratetotal, birthratetotal, abortionratetotal. These variables have a significant effect on the teenage pregnancy rate. In this case, the AIC is -4981, which indicates a very good fit of the model.
+
+### AIC
+```{r}
+forward_model <- step(model_region, direction = "forward")
+summary(forward_model)
+```
+Using  Akaike information criterion (AIC), the significant variables are abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, abortionratetotal, and regionsouthwest. These variables have a significant effect on the teenage pregnancy rate. In this case, the AIC is -4961, which indicates a very good fit of the model.
+
+### BIC
+```{r}
+backward_model <- step(model_region, direction = "backward")
+summary(backward_model)
+```
+Using  Bayesian information criterion (BIC), the significant variables are abortionrate1519, birthrate1519, population1544, pregnancyratetotal, birthratetotal, abortionratetotal. These variables have a significant effect on the teenage pregnancy rate. In this case, the AIC is -4981, which indicates a very good fit of the model.
+
+Based on the information provided, the AIC of the second model (-4961) is lower than that of the first and third models (-4981). This indicates that the second model, which is the Akaike information criterion model, is the most suitable among the three. In the AIC model, the significant variables are consistent with those in the reduced model, except for the inclusion of an additional variable, region.
+
+## Reduced Model
+```{r}
+model2 <- lm(pregnancyrate1519 ~ abortionrate1519+ birthrate1519+ pregnancyratetotal+ birthratetotal+ abortionratetotal, data = p2newdf1519)
+summary(model2)
+```
+Subsequently, we created a reduced model by including only the five variables (abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, abortionratetotal) that were previously determined to be significant in the model controlled by region (model_region). The analysis of this model revealed that all of these variables remained statistically significant. Therefore, we can conclude that there is evidence to suggest that these variables play a significant role in determining the teen pregnancy rate. 
+
+Based on the results, it appears that only the abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, abortionratetotal are significantly associated with pregnancy rates among 15 to 19 year old teens. The other variables we included, such as abstinence, abortionban_anomaly, abortionban_sex, substance_poli, and miscarriage would not affect pregnancy rates for teenagers.
+
+### Compare Controlled by Region to Reduced Model 
+```{r}
+aov2region <- anova(model2, model_region)
+aov2region
+```
+The obtained p-value for comparing the controlled by region model to the reduced model is greater than the significance level of 0.05. This indicates that the model controlled by region (Model 2) does not provide a statistically significant improvement over the reduced model (Model 1). Moreover, the reduced model is more parsimonious and easier to interpret, and therefore may be a more appropriate choice. Hence, we can conclude that the reduced model is better suited for this analysis. Therefore, further analysis would focus on reduced model to gain more insights.
+
+#### Reduced Model with Variable Region
+```{r}
+model3 <- lm(pregnancyrate1519 ~ abortionrate1519+ birthrate1519+ pregnancyratetotal+ birthratetotal+ abortionratetotal+region, data = p2newdf1519)
+summary(model3)
+```
+In Akaike information criterion model, there is an additional variable, region, that is significant. Thus, we formed a model that add on region varible to reduced model. However, the variables related to region are not statistically significant with p-values greater than 0.05. Therefore, it can be concluded that the region does not have a significant effect on the response variable.
+
+##### Compare Reduced Model (Model 2) and Reduced Model with Region (Model 3)
+```{r}
+aov23 <- anova(model2, model3)
+aov23
+```
+
+We performed an ANOVA test to compare the reduced model and the reduced model with region. The resulting p-value for comparing the reduced model to the model with region is greater than the significance level of 0.05, indicating that the addition of region did not provide a statistically significant improvement over the reduced model. Thus, we can conclude that the reduced model is the more appropriate model for this analysis. Therefore, the reduced model is the best model out of all the models that were created. The model equation is pregnancyrate1519 = 0.018069 + 1.099472(abortionrate1519) + 1.200352(birthrate1519) + 0.072934(pregnancyratetotal) - 0.087948(birthratetotal) - 0.079860(abortionratetotal)
+
+## Model Diagnostics for Reduced Model
+```{r}
+par(mfrow=c(2,2)) 
+plot(model2) 
+```
+Figure 8. Model Diagnostics for Reduced Model
+
+To evaluate whether the reduced model is a good fit for the data, we performed model diagnostics (shown in figure 8). The first step is to examine the residuals, which represent the difference between the predicted and actual values, for any patterns. We started by creating a residuals vs. fitted plot to check for non-linear relationships or heteroscedasticity. In this case, the plot indicated that the data met the regression assumptions well and there were no discernible patterns. 
+
+The next step is to check the normal QQ-plot to see whether the residuals follow a normal distribution. We found that the residuals followed a straight line, indicating that they met the normality assumption. 
+
+We then checked the Scale-Location plot to determine whether the variance of the residuals is constant across all values of the predictors. The plot showed that the residuals appeared randomly spread and we observed a horizontal line with equally (randomly) spread points, indicating that the model met the homoscedasticity assumption. 
+
+Lastly, we examined the residuals vs. leverage plot to identify influential observations, such as outliers or influential data points that may have a large effect on the model. The plot showed that there were some outliers or influential data points, but including or excluding them did not significantly affect the results. Based on the results of the model diagnostics, we can conclude that the reduced model is a good fit for the data. 
+
+### Correlation
+Next, we want to check correlation to see if there is any multicollinearity.
+
+#### Correlation Matrices
+```{r, results='markup'}
+library(corrplot)
+signp2newdf1519 <- p2new[, c("pregnancyrate1519", "abortionrate1519", "birthrate1519", "pregnancyratetotal", "birthratetotal", "abortionratetotal")]
+signp2newdf1519<-na.omit(signp2newdf1519)
+corPearson = cor(signp2newdf1519)
+corrplot.mixed(corPearson)
+mtext("Figure 9. Correlation Matrix of the Five Variables", side=1, line=4)
+```
+Through the correlation matrix in figure 9, we found that pregnancy rate is highly correlated to birthrate1519, and abortionrate1519. 
+
+#### VIF
+```{r}
+library(faraway)
+vif_values<- vif(model2)
+formatted_vif <- format(vif_values, scientific = FALSE)
+print(formatted_vif)
+```
+
+We first examined the Variance Inflation Factors (VIFs) for the variables in our regression model. We found that the VIFs for pregnancyratetotal, birthratetotal, and abortionratetotal were all above 10, indicating significant multicollinearity between these variables. To address this issue, we decided to remove these highly correlated predictors from the model. Ultimately, we chose to build the model with only abortionrate1519 and birthrate1519 as predictors, as these variables showed lower VIFs and were less correlated with each other.
+
+
+
+### Model 4
+Model 4 included only the most highly correlated variable, birthrate1519.
+```{r}
+model4 <- lm(pregnancyrate1519 ~ birthrate1519, data = p2newdf1519)
+summary(model4)
+```
+## Model 5
+Model 5 included both the most highly correlated variable, birthrate1519, and the second highly correlated variable, abortionrate1519. 
+```{r}
+model5 <- lm(pregnancyrate1519 ~ birthrate1519+abortionrate1519, data = p2newdf1519)
+summary(model5)
+```
+
+### Model 4 and 5 Comparsion 
+```{r}
+aov45 <- anova(model4, model5)
+aov45
+```
+
+We conducted two models to determine the best predictors for our analysis. Model 4 included only the most highly correlated variable, birthrate1519, while Model 5 included both the most highly correlated variable, birthrate1519, and the second highly correlated variable, abortionrate1519. We then compared the two models using an F-test, which resulted in a p-value below the significance level of 0.05. This indicates that the addition of abortionrate1519 to the model provides a statistically significant improvement over the model with only birthrate1519. Therefore, we can conclude that Model 5, which includes both birthrate1519 and abortionrate1519, is the best model out of all the models that were created for this analysis.
+
+#### Model 6: Interaction
+```{r}
+model6 <- lm(pregnancyrate1519 ~ birthrate1519*abortionrate1519, data = p2newdf1519)
+summary(model6)
+aov56 <- anova(model5, model6)
+aov56
+```
+To explore different combinations of variables, we created a model (model 6) that included the interaction term between birthrate1519 and abortionrate1519. We then compared the performance of model 5, which included both variables without an interaction term, to model 6 using an ANOVA test. The resulting p-value was greater than the significance level of 0.05, indicating that the model with the interaction term did not provide a statistically significant improvement over model 5. Therefore, we can conclude that model 5 is the more appropriate model for this analysis, and it is the best model out of all the models that were created.
+
+## Model Diagnostics for model 5
+```{r}
+par(mfrow=c(2,2)) 
+plot(model5) 
+```
+Figure 10. Model Diagnostics for Model 5
+
+To evaluate the goodness-of-fit of model 5, we performed model diagnostics as shown in Figure 10. The first step was to examine the residuals for any patterns by creating a residuals vs. fitted plot to check for non-linear relationships or heteroscedasticity. The plot indicated that the data met the regression assumptions well and there were no discernible patterns. Next, we checked the normal QQ-plot to see whether the residuals follow a normal distribution. We found that the residuals followed a straight line, indicating that they met the normality assumption. We then checked the Scale-Location plot to determine whether the variance of the residuals is constant across all values of the predictors. The plot showed that the residuals appeared randomly spread, and we observed a horizontal line with equally (randomly) spread points, indicating that the model met the homoscedasticity assumption. Finally, we examined the residuals vs. leverage plot to identify influential observations, such as outliers or influential data points that may have a large effect on the model. The plot showed that there were some outliers or influential data points, but including or excluding them did not significantly affect the results. In addition, we detected through variance inflation factors (VIF) that there is no multicollinearity. Therefore, we can conclude that model 5, which consists of two variables, birthrate1519 and abortionrate1519, is valid, reliable, and can provide accurate predictions.
+
+The model equation is: pregnancyrate1519 = -0.003076 + 1.200179 * birthrate1519 + 1.099792 * abortionrate1519. This equation shows that the predicted pregnancy rate for females aged 15-19 (pregnancyrate1519) can be estimated by adding -0.003076 to the product of 1.200179 and the birth rate for females aged 15-19 (birthrate1519), and adding 1.099792 times the abortion rate for females aged 15-19 (abortionrate1519). Both predictors are highly significant, with p-values <2e-16, indicating that they have a strong linear relationship with the response variable.
+
+# Conclusion
+Based on EDA, we can conclude that the US teen pregnancy rate has been declining since the 1990s. The pregnancy rate for teenagers aged 15 to 19 is slightly right-skewed because of the outliers in the data, particularly in California, Arizona, and the District of Columbia, which had substantially higher rates of teen pregnancy compared to other states. However, pregnancy rate can still considered to be normally distributed.
+
+Moreover, the linear regression models performed on the data suggest that several variables have a significant relationship with the teen pregnancy rate among the 15-19 age group in the United States. The variables that were found to have a statistically significant impact on the teen pregnancy rate include the abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total. Furthermore, controlling for state, year, and region variables resulted in several additional significant variables, including abortionban_sex1, abortionrate1519, birthrate1519, abortions1519, births1519, population1544, pregnancyratetotal, birthratetotal, stateAR, stateAZ, stateKS, stateKY, and stateOK. However, the analysis did not find strong evidence to suggest significant differences in the pregnancy rates among the different states, years and regions. Based on the ANOVA table results, it can be concluded that the model controlled by regions significantly improves the model's fit compared to other models.
+
+After conducting variable selection using stepwise, AIC, and BIC methods, we found that the significant variables in explaining the variation in teenage pregnancy rates were abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, and abortionratetotal. These variables were also found to be significant in the model controlled by regions, indicating that they play a significant role in determining the teen pregnancy rate.
+
+A reduced model was created including only five previously determined significant variables (abortionrate1519, birthrate1519, pregnancyratetotal, birthratetotal, abortionratetotal) which remained statistically significant. This suggests that these variables play a significant role in determining the teen pregnancy rate, while other variables such as abstinence, abortionban_anomaly, abortionban_sex, substance_poli, and miscarriage would not affect pregnancy rates for teenagers. We also performed model diagnostics with plots and found that the reduced model met the regression assumptions well and was a good fit for the data.
+
+However, based on the analysis of the VIFs, it was found that there was significant multicollinearity between the variables pregnancyratetotal, birthratetotal, and abortionratetotal. Since multicollinearity can lead to inaccurate and unreliable results in regression analysis, these highly correlated predictors were removed from the model. The decision was made to build the model (model 5) with only abortionrate1519 and birthrate1519 as predictors since they exhibited lower VIFs and were less correlated with each other. It was found to be the best model out of all the models that were created and met the regression assumptions well. This approach will likely lead to a more accurate and reliable regression model that can be used to answer our SMART question.
+
+# Answer to SMART Question
+
+Our SMART question is more about inference of the cause of the decrease in teen pregnancy rates from 1988 to 2017 by the state in the US. The model results suggests that the variables abortion rate and birth rate are the main factors that contribute to the decrease in teen pregnancy rates observed between 1988 and 2017 in the US. These two variables appear to have a significant impact on teen pregnancy rates, indicating that higher abortion and birth rates among 15-19-year-olds are associated with higher teen pregnancy rates.
+
+On the other hand, the model results suggest that other variables such as abstinence, abortionban_anomaly, abortionban_sex, substance_poli, and miscarriage are not significant predictors of teen pregnancy rates. This implies that these variables do not play a significant role in explaining the decrease in teen pregnancy rates observed over the study period.
+
+Overall, the interpretation of the model results suggests that policies and programs aimed at reducing teen pregnancy rates may need to focus on strategies that address abortion and birth rates among 15-19-year-olds, as these factors appear to have the greatest impact on teen pregnancy rates. However, it is important to note that the model results should be interpreted with caution and in consideration of the study's limitations and assumptions.
+
+# Further Research
+While our analysis sheds some light on the factors that contribute to the decrease in teen pregnancy rates in the US, there are still some limitations and avenues for further research. First, our study assumes that the predictors included in the model are the only factors that influence teen pregnancy rates, which may not be the case in reality. Future research could explore other factors that may contribute to teen pregnancy rates, such as social and cultural attitudes towards sex and reproduction, peer influences, and media exposure.
+
+Second, our study only considers state-level data and may not capture the nuances of teen pregnancy rates at the local level. Future research could explore how community-level factors such as access to healthcare, education, and social support may influence teen pregnancy rates.
+
+Third, our study focuses only on the US and does not consider cross-country differences in teen pregnancy rates. Future research could explore how cultural, economic, and policy differences between countries may contribute to variations in teen pregnancy rates.
+
+Lastly, our study assumes that the relationships between the variables are linear, which may not be the case in reality. Future research could explore nonlinear relationships between the predictors and the response variable to better understand the nature of the relationship between the variables.
+
+```{r}
+model7 <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli + miscarriagestotal+ state, data = p2newdf1519)
+summary(model7)
+```
