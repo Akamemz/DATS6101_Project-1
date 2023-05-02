@@ -40,9 +40,11 @@ str(p2)
 
 # Introduction
 
-Building upon exploratory data analysis, we researched what factors could effect teenage pregnancy. Originally, we only looked at if the person was likely to have an abstinence only education on the likelihood of them getting pregnant. 
+Building upon exploratory data analysis, we researched what factors could effect teenage pregnancy. Originally, we only looked at if the person was likely to have an abstinence only education on the likelihood of them getting pregnant. From our last segment, we realized we had too few observations and too few co-variates.
 
 # Data Set Description 
+
+Using our findings from the first project, we changed our dataset to the Guttmacher Institute's report: "Pregnancies, Births and Abortions in the United States, 1973–2017: National and State Trends by Age." This dataset uses  publicly available CDC data to estimate the number of births and distribution of abortions by age. The population of women came from Census Bureau data while the raw number of abortions came from internal Guttmacher Institute data (Maddow-Zimet & Kost, 2021). 
 
 Variable |  Definition  
   :-:    |  :-- 
@@ -97,7 +99,7 @@ str(p2new)
 p2US <- subset(p2, state=="US") 
 str(p2US)
 ```
-Secondly, we convert the variables abstinence, abortionban_anomaly, abortionban_sex, and substance_poli into factor variables.
+Secondly, we converted the abstinence, abortionban_anomaly, abortionban_sex, and substance_poli variables into factor variables.
 ```{r}
 # Factor Conversions
 p2new$abstinence=as.factor(p2new$abstinence)
