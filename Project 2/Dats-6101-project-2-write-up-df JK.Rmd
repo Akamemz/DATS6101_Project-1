@@ -91,7 +91,7 @@ miscarriagestotal |	Total number of miscarriages
 pregnanciestotal |	Total number of pregnancies
 
 ## Cleaning Dataset
-First, we split the data into two dataset: one including data for all states, and another one containing data for the United States as a whole.
+We split the data into two data sets: one including data for all states, and another one containing data for the United States as a whole.
 ```{r, results='hide'}
 # subset US and other states
 p2new <- subset(p2, state != "US")
@@ -171,7 +171,7 @@ ggplot(data=p2US, aes(x=year, y=pregnancyrate1519, color = "red")) +
 Figure 1 shows that the US pregnancy rate has been declining since the 1990s. Prior to the 1990s, the pregnancy rate in the US was increasing. The number of births in the US peaked in 1990 and reached its lowest point in 2017. The trend indicates that the number of US births was generally decreasing from 1990 to 2017.
 
 ## Normality Tests
-We have conducted normality tests on the distribution of our response variable, pregnancyrate1519 and have identified that it can be considered normally distributed.
+We conducted normality tests on the distribution of our response variable, the pregnancy rate for teenagers aged 15 to 19 and have identified that this is normally distributed.
 
 ### Distribution of Pregnancyrate1519 
 ```{r}
@@ -180,9 +180,10 @@ boxplot(p2new$ pregnancyrate1519 , main="Figure 3. Boxplot of Pregnancyrate1519"
 qqnorm(p2new$ pregnancyrate1519 , main="Figure 4. QQ-plot of Pregnancyrate1519")
 qqline(p2new$ pregnancyrate1519)
 ```
-The response variable is the pregnancy rate for teenagers aged 15 to 19. The histogram (figure 2) and boxplot (figure 3) indicate that it is slightly right-skewed, likely due to the presence of outliers. However, the QQ-plot (figure 4) closely follows the normal line, suggesting that the distribution is still considered to be normal.
 
-Removing all the outliers can be an option to deal with outliers. On the other hand, it is important to carefully consider the reason for the outliers before removing them, as this could impact the validity of the results.
+The histogram (figure 2) and boxplot (figure 3) indicate that it is slightly right-skewed, likely due to the presence of outliers. However, the QQ-plot (figure 4) closely follows the normal line, suggesting that the distribution is still considered to be normal.
+
+While we could remove all outliers to eliminate their influence, we need to carefully consider why they are there in the first place. This could impact the validity of the results.
 
 #### Pregnancy Rate Outliers
 ```{r, results='hide', fig.keep = 'none'}
@@ -210,14 +211,16 @@ ggplot() +
   geom_point(data = us_map[us_map$region == "district of columbia", ], aes(x = long, y = lat), color = "green", size = 3, shape = 1)
 
 ```
-During our examination of pregnancy rate outliers, it became evident that the majority of these outliers occur in three particular states: California, Arizona, and District of Columbia (Figure 5). In comparison to other states, these three states exhibit substantially higher rates of teen pregnancy. 
+
+When examining outliers, we found that the majority of these outliers occured in three states: California, Arizona, and District of Columbia (Figure 5). The data from the Guttmacher Institute shows these states exhibit substantially higher rates of teen pregnancy. 
 
 #### Pregnancy Rates Total - Important Observations by Select States
 ```{r}
 model_birthrate_state<-lm(pregnancyratetotal~birthratetotal + state, data = p2newdf1519)
 summary(model_birthrate_state)
 ```
-After identifying California, Arizona, and District of Columbia as outliers due to their extreme values, we used them as regressors in a linear regression to determine their contribution to pregnancy rates total in selected states. The coefficient here represents the expected change in the pregnancy rate for the three states when compared to the average pregnancy rate total for all states. Since these coefficients have a positive value and are statistically significant (as indicated by the low p-value), it suggests that the three states has a higher number of pregnancies compared to all states. These findings can be used to inform policy decisions and programs aimed at reducing unwanted pregnancies in the states under review.
+
+We used the identified outlier states as regressors in a linear regression to determine their contribution to pregnancy rates total. The coefficient represents the expected change in the pregnancy rate for the three states when compared to the average pregnancy rate total for all states. Since these coefficients have a positive value and are statistically significant (as indicated by the low p-value), it suggests that the three states have a higher number of pregnancies compared to all states. These findings can be used to inform policy decisions and programs aimed at reducing unwanted pregnancies in the states under review.
 
 #### Pregnancies Over Years in States
 ```{r}
@@ -226,10 +229,11 @@ ggplot(data=p2new)+
   geom_point(mapping = aes(x=year, y=pregnancies1519, color=state))+
   labs(title = "Scatterplot of Pregnancies in TP", caption = "Figure 6. Scatterplot of Pregnancies of Each State")
 ```
-Based on Figure 6, it is evident that California, Arizona, and District of Columbia (the outlier states) have a higher number of births compared to other states. However, they still exhibit a trend similar to that of other states, which is a decreasing trend in the number of teen pregnancies over the years. Therefore, it can be concluded that, in general, the trend for each state is decreasing over time. Therefore, it is not necessary to remove the outliers and the pregnancy rate can be treated as following a normal distribution.
+Based on Figure 6, the outlier states have a higher number of births compared to other states. However, they still exhibit a trend similar to that of other states, which is a decreasing trend in the number of teen pregnancies over the years. Therefore, it can be concluded that, in general, the trend for each state is decreasing over time. Therefore, it is not necessary to remove the outliers and the pregnancy rate can be treated as following a normal distribution.
 
 ## Abstinence Scales
-Next, we will analyze the correlation between the abstinence rates of each state and their respective pregnancy rates.
+
+Next, we will analyze the correlation between the presence of an abstinence education in school curricula for each state and their respective pregnancy rates.
 
 ### Pregnancy Rate by State Accounting for Abstinence Education
 ```{r}
@@ -238,7 +242,8 @@ ggplot(data=p2new)+
   geom_point(mapping = aes(x=pregnancyrate1519, y=state, color=abstinence))+
   labs(title = "Pregnancy Rate by State Accounting for Abstinence Education", caption = "Figure 7. Pregnancy Rate by State Accounting for Abstinence Education")
 ```
-Figure 7 shows a scatter plot of the state pregnancies of each state plotted against their corresponding abstinence scales, where a score of 0 represents the absence of any abstinence laws and a score of 1 indicates the presence of certain scales of law for abstinence. However, no clear patterns were observed in the plot, suggesting the need for further analysis of the effectiveness of sex education for teenagers.
+
+Figure 7 shows a scatter plot of the state pregnancies of each state plotted against their corresponding abstinence scales, where a score of 0 represents the absence of any abstinence education laws and a score of 1 indicates the presence of requiring some degree of abstinence to be taught in schools in that state. However, no clear patterns were observed in the plot, suggesting the need for further analysis of the effectiveness of sex education for teenagers.
 
 ### Comparing Cover Sex Education and Not Cover Sex Education
 We will take the necessary steps to test for any disparities between the group that received covered sex education and the group that did not receive covered sex education.
@@ -253,6 +258,7 @@ str(notcover)
 sexedu1519 = t.test(cover$pregnancyrate1519, notcover$pregnancies1519, conf.level=0.95)
 sexedu1519
 ```
+
 We conducted t-tests to compare the pregnancy rates of the 15 to 19 age group between the group that received sex education and the group that did not receive sex education at a 95% confidence level. The p-value is less than the significance level of 0.05 indicating that the difference between the two groups is statistically significant, and we reject the null hypothesis that there is no difference. The results here suggest that there is a statistically significant difference in pregnancy rates between the two groups, indicating that sex education has an impact on reducing pregnancy rates among teenagers. To further investigate the decrease in teen pregnancy rates, we will employ various models to determine whether factors such as abstinence education had an impact on the observed trend.
 
 # Data Analysis
