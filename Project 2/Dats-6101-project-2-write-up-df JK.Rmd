@@ -233,7 +233,7 @@ Based on Figure 6, the outlier states have a higher number of births compared to
 
 ## Abstinence Scales
 
-Next, we will analyze the correlation between the presence of an abstinence education in school curricula for each state and their respective pregnancy rates.
+We further analyzed the correlation between the presence of an abstinence education in school curricula for each state and their respective pregnancy rates.
 
 ### Pregnancy Rate by State Accounting for Abstinence Education
 ```{r}
@@ -245,8 +245,9 @@ ggplot(data=p2new)+
 
 Figure 7 shows a scatter plot of the state pregnancies of each state plotted against their corresponding abstinence scales, where a score of 0 represents the absence of any abstinence education laws and a score of 1 indicates the presence of requiring some degree of abstinence to be taught in schools in that state. However, no clear patterns were observed in the plot, suggesting the need for further analysis of the effectiveness of sex education for teenagers.
 
-### Comparing Cover Sex Education and Not Cover Sex Education
-We will take the necessary steps to test for any disparities between the group that received covered sex education and the group that did not receive covered sex education.
+### Comparing Covering Abstinence and Not Covering Abstinence
+
+After we created the dichotomous variable indicating the presence of abstinence education in the curriculum, we tested disparities between those who resided in a state with a requirement for some sort of abstinence education and those who resided in a state with no such requirement. 
 ```{r, results='hide'}
 cover <- subset(p2new, abstinence==0) 
 str(cover)
@@ -259,7 +260,7 @@ sexedu1519 = t.test(cover$pregnancyrate1519, notcover$pregnancies1519, conf.leve
 sexedu1519
 ```
 
-We conducted t-tests to compare the pregnancy rates of the 15 to 19 age group between the group that received sex education and the group that did not receive sex education at a 95% confidence level. The p-value is less than the significance level of 0.05 indicating that the difference between the two groups is statistically significant, and we reject the null hypothesis that there is no difference. The results here suggest that there is a statistically significant difference in pregnancy rates between the two groups, indicating that sex education has an impact on reducing pregnancy rates among teenagers. To further investigate the decrease in teen pregnancy rates, we will employ various models to determine whether factors such as abstinence education had an impact on the observed trend.
+We conducted t-tests to compare the pregnancy rates of the 15 to 19 age group between the group that received sex education and the group that did not receive sex education at a 95% confidence level. The p-value is less than the significance level of 0.05 indicating that the difference between the two groups is statistically significant. We reject the null hypothesis that there is no difference. The results here suggest that there is a statistically significant difference in pregnancy rates between the two groups, indicating that sex education has an impact on reducing pregnancy rates among teenagers. To further investigate the decrease in teen pregnancy rates, we utilized various models to determine whether factors such as abstinence education had an impact on the observed trend.
 
 # Data Analysis
 ## Full Linear Regression Model
@@ -267,9 +268,10 @@ We conducted t-tests to compare the pregnancy rates of the 15 to 19 age group be
 model1 <- lm(pregnancyrate1519 ~ abstinence+ abortionban_anomaly+ abortionban_sex+ substance_poli+ abortionrate1519+ birthrate1519+  abortionratio1519+ pregnancies1519+ abortions1519+ births1519+ miscarriages1519+ population1519+ population1544+ abortionstotal+ birthstotal+ pregnancyratetotal+ birthratetotal+ abortionratetotal+ abortionratiototal+ miscarriagestotal+ pregnanciestotal, data = p2newdf1519)
 summary(model1)
 ```
-First, a linear regression model was performed on the 15-19 age group, which included all available factors except for year and states. This model is referred to as the full model. The coefficients column in the results table shows the estimated effect of each predictor variable on the response variable, while holding all other predictors constant. For example, the coefficient for abortion rate among 15-19 year-olds is 1.1, indicating that for every one unit increase in the abortion rate per 1,000 females aged 15-19, the teen pregnancy rate is estimated to increase by 1.10 units, assuming all other variables remain constant. Similarly, the coefficient for birth rate in the linear regression model is 1.2, which means that for every one unit increase in the birth rate, the teen pregnancy rate is estimated to increase by 1.20 units, while all other factors are held constant.
 
-Our analysis indicates that the abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total are significant variables that impact the teen pregnancy rate, as their p-values are less than 0.05. A p-value less than 0.05 indicates that there is evidence to reject the null hypothesis and that the corresponding variable has a statistically significant relationship with the teen pregnancy rate. Therefore, we can conclude that there is evidence to suggest that the abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total have a statistically significant relationship with the teen pregnancy rate in the population.
+We performed a linear regression model on the 15-19 age group, which included all available factors except for year and states. This is the "full model". The coefficients column in the results table show the estimated effect of each predictor variable on the response variable, while holding all other predictors constant. For example, the coefficient for abortion rate among 15-19 year-olds is 1.1, indicating that for every one unit increase in the abortion rate per 1,000 females aged 15-19, the teen pregnancy rate is estimated to increase by 1.10 units, assuming all other variables remain constant. Similarly, the coefficient for birth rate in the linear regression model is 1.2, which means that for every one unit increase in the birth rate, the teen pregnancy rate is estimated to increase by 1.20 units, while all other factors are held constant.
+
+Our analysis indicates that the abortion rate, birth rate, total pregnancy rate, birth rate total, and abortion rate total are significant variables that impact the teen pregnancy rate, as their p-values are less than 0.05. A p-value less than 0.05 indicates that there is evidence to reject the null hypothesis and that the corresponding variable has a statistically significant relationship with the teen pregnancy rate. Therefore, we can conclude that there is evidence to suggest that the abortion rate, birth rate, total pregnancy rate, total birth rate, and total abortion rate have a statistically significant relationship with the teen pregnancy rate in the population.
 
 ### Controlled Variables
 #### Controlled by State 
@@ -280,7 +282,7 @@ summary(model_state)
 ```
 Based on the linear regression model with controlled state for 15 to 19 year old teens, the coefficient for state represents the change in pregnancy rate for a one-unit increase in the "state" variable. For example, the estimated coefficient for the state Arizona (AZ) is 0.132, which means that a one-unit increase in Arizona is associated with a 0.132 increase in pregnancy rate.
 
-The analysis also shows that there are several significant variables that impact the teen pregnancy rate, including abortionban_sex1, abortionrate1519, birthrate1519, abortions1519, births1519, population1544, pregnancyratetotal, birthratetotal, stateAR, stateAZ, stateKS, stateKY, and stateOK. These variables have p-values less than 0.05, indicating that there is evidence to suggest that they have a statistically significant relationship with the teen pregnancy rate in the population when controlling for the state variable. Therefore, it can be concluded that these variables play an important role in predicting the teen pregnancy rate. It is important to note that the model has singularities since there are four NAs.
+The analysis shows there are several significant variables impacting the teen pregnancy rate, including abortionban_sex1, abortionrate1519, birthrate1519, abortions1519, births1519, population1544, pregnancyratetotal, birthratetotal, stateAR, stateAZ, stateKS, stateKY, and stateOK. These variables have p-values less than 0.05, indicating that there is evidence to suggest that they have a statistically significant relationship with the teen pregnancy rate in the population when controlling for the state variable. Therefore, we can conclude that these variables play an important role in predicting the teen pregnancy rate. It is important to note that the model has singularities since there are four NAs.
 
 #### Controlled by Region
 ```{r}
@@ -303,7 +305,7 @@ This model estimates the coefficients for different years, indicating the averag
 Our analysis indicates that six variables have a statistically significant relationship with the teen pregnancy rate in the population, as their p-values are less than 0.05. These variables are abortionban_sex1, abortion rate, birth rate, pregnancy rate total, birth rate total, and abortion rate total. Therefore, we can conclude that there is evidence to suggest that these variables play a significant role in determining the teen pregnancy rate under control of years.
 
 ### Comparing Models
-We will use anova test to compare full model, model that controlls state, region, and year to find out the best model
+We used the anova test to compare the full model and the model that controls for state, region, and year to determine the best fit.
 ```{r}
 anova(model1, model_state, model_region, model_year)
 ```
